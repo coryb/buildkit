@@ -22,7 +22,9 @@ import (
 	"github.com/moby/buildkit/session/sshforward/sshprovider"
 	"github.com/moby/buildkit/solver/errdefs"
 	"github.com/moby/buildkit/solver/pb"
+	"github.com/moby/buildkit/util/entitlements"
 	utilsystem "github.com/moby/buildkit/util/system"
+	"github.com/moby/buildkit/util/testutil/echoserver"
 	"github.com/moby/buildkit/util/testutil/integration"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
@@ -48,7 +50,19 @@ func TestClientGatewayIntegration(t *testing.T) {
 		testClientGatewayExecError,
 		testClientGatewaySlowCacheExecError,
 		testClientGatewayExecFileActionError,
+		testClientGatewayContainerExtraHosts,
 	}, integration.WithMirroredImages(integration.OfficialImages("busybox:latest")))
+
+	integration.Run(t, []integration.Test{
+		testClientGatewayContainerHostNetworking,
+	},
+		integration.WithMirroredImages(integration.OfficialImages("busybox:latest")),
+		integration.WithMatrix("netmode", map[string]interface{}{
+			"default": defaultNetwork,
+			"host":    hostNetwork,
+		}),
+	)
+
 }
 
 func testClientGatewaySolve(t *testing.T, sb integration.Sandbox) {
@@ -1473,6 +1487,167 @@ func testClientGatewayExecFileActionError(t *testing.T, sb integration.Sandbox) 
 	}
 
 	_, err = c.Build(ctx, SolveOpt{}, "buildkit_test", b, nil)
+	require.NoError(t, err)
+
+	checkAllReleasable(t, c, sb, true)
+}
+
+func testClientGatewayContainerExtraHosts(t *testing.T, sb integration.Sandbox) {
+	requiresLinux(t)
+
+	ctx := sb.Context()
+	product := "buildkit_test"
+
+	c, err := New(ctx, sb.Address())
+	require.NoError(t, err)
+	defer c.Close()
+
+	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
+		st := llb.Image("busybox")
+
+		def, err := st.Marshal(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal state")
+		}
+
+		r, err := c.Solve(ctx, client.SolveRequest{
+			Definition: def.ToPB(),
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to solve")
+		}
+
+		ctr, err := c.NewContainer(ctx, client.NewContainerRequest{
+			Mounts: []client.Mount{{
+				Dest:      "/",
+				MountType: pb.MountType_BIND,
+				Ref:       r.Ref,
+			}},
+			ExtraHosts: []*pb.HostIP{{
+				Host: "some.host",
+				IP:   "169.254.11.22",
+			}},
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		stdout := bytes.NewBuffer(nil)
+		stderr := bytes.NewBuffer(nil)
+
+		pid, err := ctr.Start(ctx, client.StartRequest{
+			Args:   []string{"grep", "169.254.11.22\tsome.host", "/etc/hosts"},
+			Stdout: &nopCloser{stdout},
+			Stderr: &nopCloser{stderr},
+		})
+		if err != nil {
+			ctr.Release(ctx)
+			return nil, err
+		}
+		defer ctr.Release(ctx)
+
+		err = pid.Wait()
+
+		t.Logf("Stdout: %q", stdout.String())
+		t.Logf("Stderr: %q", stderr.String())
+
+		require.NoError(t, err)
+
+		return &client.Result{}, nil
+	}
+
+	_, err = c.Build(ctx, SolveOpt{}, product, b, nil)
+	require.NoError(t, err)
+
+	checkAllReleasable(t, c, sb, true)
+}
+
+func testClientGatewayContainerHostNetworking(t *testing.T, sb integration.Sandbox) {
+	if os.Getenv("BUILDKIT_RUN_NETWORK_INTEGRATION_TESTS") == "" {
+		t.SkipNow()
+	}
+
+	requiresLinux(t)
+
+	ctx := sb.Context()
+	product := "buildkit_test"
+
+	var allowedEntitlements []entitlements.Entitlement
+	netMode := pb.NetMode_UNSET
+	if sb.Value("netmode") == hostNetwork {
+		netMode = pb.NetMode_HOST
+		allowedEntitlements = []entitlements.Entitlement{entitlements.EntitlementNetworkHost}
+	}
+	c, err := New(sb.Context(), sb.Address())
+	require.NoError(t, err)
+	defer c.Close()
+
+	s, err := echoserver.NewTestServer("foo")
+	require.NoError(t, err)
+	addrParts := strings.Split(s.Addr().String(), ":")
+	port := addrParts[len(addrParts)-1]
+
+	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
+		st := llb.Image("busybox")
+
+		def, err := st.Marshal(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal state")
+		}
+
+		r, err := c.Solve(ctx, client.SolveRequest{
+			Definition: def.ToPB(),
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to solve")
+		}
+
+		ctr, err := c.NewContainer(ctx, client.NewContainerRequest{
+			Mounts: []client.Mount{{
+				Dest:      "/",
+				MountType: pb.MountType_BIND,
+				Ref:       r.Ref,
+			}},
+			NetMode: netMode,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		stdout := bytes.NewBuffer(nil)
+		stderr := bytes.NewBuffer(nil)
+
+		pid, err := ctr.Start(ctx, client.StartRequest{
+			Args:   []string{"/bin/sh", "-c", fmt.Sprintf("nc 127.0.0.1 %s | grep foo", port)},
+			Stdout: &nopCloser{stdout},
+			Stderr: &nopCloser{stderr},
+		})
+		if err != nil {
+			ctr.Release(ctx)
+			return nil, err
+		}
+		defer ctr.Release(ctx)
+
+		err = pid.Wait()
+
+		t.Logf("Stdout: %q", stdout.String())
+		t.Logf("Stderr: %q", stderr.String())
+
+		if netMode == pb.NetMode_HOST {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+
+		return &client.Result{}, nil
+	}
+
+	solveOpts := SolveOpt{
+		AllowedEntitlements: allowedEntitlements,
+	}
+	_, err = c.Build(ctx, solveOpts, product, b, nil)
 	require.NoError(t, err)
 
 	checkAllReleasable(t, c, sb, true)
