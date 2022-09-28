@@ -2,6 +2,7 @@ package oci
 
 import (
 	"context"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -188,6 +189,15 @@ func GenerateSpec(ctx context.Context, meta executor.Meta, mounts []executor.Mou
 			Type:        "bind",
 			Source:      tracingSocket,
 			Options:     []string{"ro", "rbind"},
+		})
+	}
+
+	if _, err := os.Stat("/dev/zfs"); err == nil {
+		s.Mounts = append(s.Mounts, specs.Mount{
+			Destination: "/dev/zfs",
+			Type:        "bind",
+			Source:      "/dev/zfs",
+			Options:     []string{"rbind"},
 		})
 	}
 
