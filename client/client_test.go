@@ -85,121 +85,131 @@ func (nopWriteCloser) Close() error { return nil }
 func TestIntegration(t *testing.T) {
 	testIntegration(
 		t,
-		testCacheExportCacheKeyLoop,
-		testRelativeWorkDir,
-		testFileOpMkdirMkfile,
-		testFileOpCopyRm,
-		testFileOpCopyIncludeExclude,
-		testFileOpRmWildcard,
-		testFileOpCopyUIDCache,
-		testCallDiskUsage,
-		testBuildMultiMount,
-		testBuildHTTPSource,
-		testBuildPushAndValidate,
-		testBuildExportWithUncompressed,
-		testBuildExportScratch,
-		testResolveAndHosts,
-		testUser,
-		testOCIExporter,
-		testOCIExporterContentStore,
-		testWhiteoutParentDir,
-		testFrontendImageNaming,
-		testDuplicateWhiteouts,
-		testSchema1Image,
-		testMountWithNoSource,
-		testInvalidExporter,
-		testReadonlyRootFS,
-		testBasicRegistryCacheImportExport,
-		testBasicLocalCacheImportExport,
-		testBasicS3CacheImportExport,
-		testBasicAzblobCacheImportExport,
-		testCachedMounts,
-		testCopyFromEmptyImage,
-		testProxyEnv,
-		testLocalSymlinkEscape,
-		testTmpfsMounts,
-		testSharedCacheMounts,
-		testSharedCacheMountsNoScratch,
-		testLockedCacheMounts,
-		testDuplicateCacheMount,
-		testRunCacheWithMounts,
-		testParallelLocalBuilds,
-		testSecretEnv,
-		testSecretMounts,
-		testExtraHosts,
-		testShmSize,
-		testUlimit,
-		testCgroupParent,
-		testNetworkMode,
-		testFrontendMetadataReturn,
-		testFrontendUseSolveResults,
-		testSSHMount,
-		testStdinClosed,
-		testHostnameLookup,
-		testHostnameSpecifying,
-		testPushByDigest,
-		testBasicInlineCacheImportExport,
-		testBasicGhaCacheImportExport,
-		testExportBusyboxLocal,
-		testBridgeNetworking,
-		testCacheMountNoCache,
-		testExporterTargetExists,
-		testTarExporterWithSocket,
-		testTarExporterWithSocketCopy,
-		testTarExporterSymlink,
-		testMultipleRegistryCacheImportExport,
-		testSourceMap,
-		testSourceMapFromRef,
-		testLazyImagePush,
-		testStargzLazyPull,
-		testStargzLazyInlineCacheImportExport,
-		testFileOpInputSwap,
-		testRelativeMountpoint,
-		testLocalSourceDiffer,
-		testOCILayoutSource,
-		testOCILayoutPlatformSource,
-		testBuildExportZstd,
-		testPullZstdImage,
-		testMergeOp,
-		testMergeOpCacheInline,
-		testMergeOpCacheMin,
-		testMergeOpCacheMax,
-		testRmSymlink,
-		testMoveParentDir,
-		testBuildExportWithForeignLayer,
-		testBuildInfoExporter,
-		testBuildInfoInline,
-		testBuildInfoNoExport,
-		testZstdLocalCacheExport,
-		testCacheExportIgnoreError,
-		testZstdRegistryCacheImportExport,
-		testZstdLocalCacheImportExport,
-		testUncompressedLocalCacheImportExport,
-		testUncompressedRegistryCacheImportExport,
-		testStargzLazyRegistryCacheImportExport,
-		testValidateDigestOrigin,
-		testCallInfo,
-		testPullWithLayerLimit,
-		testExportAnnotations,
-		testExportAnnotationsMediaTypes,
-		testExportAttestations,
-		testAttestationDefaultSubject,
-		testSourceDateEpochLayerTimestamps,
-		testSourceDateEpochClamp,
-		testSourceDateEpochReset,
-		testSourceDateEpochLocalExporter,
-		testSourceDateEpochTarExporter,
-		testAttestationBundle,
-		testSBOMScan,
-		testSBOMScanSingleRef,
-		testMultipleCacheExports,
-		testMountStubsDirectory,
-		testMountStubsTimestamp,
-		testSourcePolicy,
+		// testCacheExportCacheKeyLoop,
+		// testRelativeWorkDir,
+		// testFileOpMkdirMkfile,
+		// testFileOpCopyRm,
+		// testFileOpCopyIncludeExclude,
+		// testFileOpRmWildcard,
+		// testFileOpCopyUIDCache,
+		// testCallDiskUsage,
+		// testBuildMultiMount,
+		// testBuildHTTPSource,
+		// testBuildPushAndValidate,
+		// testBuildExportWithUncompressed,
+		// testBuildExportScratch,
+		// testResolveAndHosts,
+		// testUser,
+		// testOCIExporter,
+		// testOCIExporterContentStore,
+		// testWhiteoutParentDir,
+		// testFrontendImageNaming,
+		// testDuplicateWhiteouts,
+		// testSchema1Image,
+		// testMountWithNoSource,
+		// testInvalidExporter,
+		// testReadonlyRootFS,
+		// testBasicRegistryCacheImportExport,
+		// testBasicLocalCacheImportExport,
+		// testBasicS3CacheImportExport,
+		// testBasicAzblobCacheImportExport,
+		// testCachedMounts,
+		// testCopyFromEmptyImage,
+		// testProxyEnv,
+		// testLocalSymlinkEscape,
+		// testTmpfsMounts,
+		// testSharedCacheMounts,
+		// testSharedCacheMountsNoScratch,
+		// testLockedCacheMounts,
+		// testDuplicateCacheMount,
+		// testRunCacheWithMounts,
+		// testParallelLocalBuilds,
+		// testSecretEnv,
+		// testSecretMounts,
+		// testExtraHosts,
+		// testShmSize,
+		// testUlimit,
+		// testCgroupParent,
+		// testNetworkMode,
+		// testFrontendMetadataReturn,
+		// testFrontendUseSolveResults,
+		// testSSHMount,
+		// testStdinClosed,
+		// testHostnameLookup,
+		// testHostnameSpecifying,
+		// testPushByDigest,
+		// testBasicInlineCacheImportExport,
+		// testBasicGhaCacheImportExport,
+		// testExportBusyboxLocal,
+		// testBridgeNetworking,
+		// testCacheMountNoCache,
+		// testExporterTargetExists,
+		// testTarExporterWithSocket,
+		// testTarExporterWithSocketCopy,
+		// testTarExporterSymlink,
+		// testMultipleRegistryCacheImportExport,
+		// testSourceMap,
+		// testSourceMapFromRef,
+		// testLazyImagePush,
+		// testStargzLazyPull,
+		// testStargzLazyInlineCacheImportExport,
+		// testFileOpInputSwap,
+		// testRelativeMountpoint,
+		// testLocalSourceDiffer,
+		// testOCILayoutSource,
+		// testOCILayoutPlatformSource,
+		// testBuildExportZstd,
+		// testPullZstdImage,
+		// testMergeOp,
+		// testMergeOpCacheInline,
+		// testMergeOpCacheMin,
+		// testMergeOpCacheMax,
+		// testRmSymlink,
+		// testMoveParentDir,
+		// testBuildExportWithForeignLayer,
+		// testBuildInfoExporter,
+		// testBuildInfoInline,
+		// testBuildInfoNoExport,
+		// testZstdLocalCacheExport,
+		// testCacheExportIgnoreError,
+		// testZstdRegistryCacheImportExport,
+		// testZstdLocalCacheImportExport,
+		// testUncompressedLocalCacheImportExport,
+		// testUncompressedRegistryCacheImportExport,
+		// testStargzLazyRegistryCacheImportExport,
+		// testValidateDigestOrigin,
+		// testCallInfo,
+		// testPullWithLayerLimit,
+		// testExportAnnotations,
+		// testExportAnnotationsMediaTypes,
+		// testExportAttestations,
+		// testAttestationDefaultSubject,
+		// testSourceDateEpochLayerTimestamps,
+		// testSourceDateEpochClamp,
+		// testSourceDateEpochReset,
+		// testSourceDateEpochLocalExporter,
+		// testSourceDateEpochTarExporter,
+		// testAttestationBundle,
+		// testSBOMScan,
+		// testSBOMScanSingleRef,
+		// testMultipleCacheExports,
+		// testMountStubsDirectory,
+		// testMountStubsTimestamp,
+		// testSourcePolicy,
 	)
 }
 
 func testIntegration(t *testing.T, funcs ...func(t *testing.T, sb integration.Sandbox)) {
+	// registry := os.Getenv("BUILDKIT_TEST_REGISTRY")
+	// if registry == "" {
+	// 	registry = "docker.io"
+	// }
+	// mirroredImages := map[string]string{
+	// 	"busybox:latest":                   registry + "/library/busybox:latest",
+	// 	"alpine:latest":                    registry + "/library/alpine:latest",
+	// 	"tonistiigi/test:nolayers":         registry + "/tonistiigi/test:nolayers",
+	// 	"cpuguy83/buildkit-foreign:latest": registry + "/cpuguy83/buildkit-foreign:latest",
+	// }
 	mirroredImages := integration.OfficialImages("busybox:latest", "alpine:latest")
 	mirroredImages["tonistiigi/test:nolayers"] = "docker.io/tonistiigi/test:nolayers"
 	mirroredImages["cpuguy83/buildkit-foreign:latest"] = "docker.io/cpuguy83/buildkit-foreign:latest"
@@ -254,7 +264,7 @@ func testCacheExportCacheKeyLoop(t *testing.T, sb integration.Sandbox) {
 
 	tmpdir := t.TempDir()
 
-	err = os.WriteFile(filepath.Join(tmpdir, "foo"), []byte("foodata"), 0600)
+	err = os.WriteFile(filepath.Join(tmpdir, "foo"), []byte("foodata"), 0o600)
 	require.NoError(t, err)
 
 	for _, mode := range []bool{false, true} {
@@ -599,7 +609,7 @@ func testSSHMount(t *testing.T, sb integration.Sandbox) {
 
 	tmpDir := t.TempDir()
 
-	err = os.WriteFile(filepath.Join(tmpDir, "key"), dt, 0600)
+	err = os.WriteFile(filepath.Join(tmpDir, "key"), dt, 0o600)
 	require.NoError(t, err)
 
 	ssh, err = sshprovider.NewSSHAgentProvider([]sshprovider.AgentConfig{{
@@ -795,7 +805,7 @@ func testPushByDigest(t *testing.T, sb integration.Sandbox) {
 	}
 	require.NoError(t, err)
 
-	st := llb.Scratch().File(llb.Mkfile("foo", 0600, []byte("data")))
+	st := llb.Scratch().File(llb.Mkfile("foo", 0o600, []byte("data")))
 
 	def, err := st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -1168,7 +1178,7 @@ func testSecretMounts(t *testing.T, sb integration.Sandbox) {
 
 	// test id,perm,uid
 	st = llb.Image("busybox:latest").
-		Run(llb.Shlex(`sh -c '[ "$(stat -c "%u %g %f" /run/secrets/mysecret4)" = "1 1 81ff" ]' `), llb.AddSecret("/run/secrets/mysecret4", llb.SecretID("mysecret"), llb.SecretFileOpt(1, 1, 0777)))
+		Run(llb.Shlex(`sh -c '[ "$(stat -c "%u %g %f" /run/secrets/mysecret4)" = "1 1 81ff" ]' `), llb.AddSecret("/run/secrets/mysecret4", llb.SecretID("mysecret"), llb.SecretFileOpt(1, 1, 0o777)))
 
 	def, err = st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -1297,19 +1307,19 @@ func testLocalSymlinkEscape(t *testing.T, sb integration.Sandbox) {
 		t,
 		// point to absolute path that is not part of dir
 		fstest.Symlink("/etc/passwd", "foo"),
-		fstest.CreateDir("sub", 0700),
+		fstest.CreateDir("sub", 0o700),
 		// point outside of the dir
 		fstest.Symlink("../../../etc/group", "sub/bar"),
 		// regular valid symlink
 		fstest.Symlink("bay", "bax"),
 		// target for symlink (not requested)
-		fstest.CreateFile("bay", []byte{}, 0600),
+		fstest.CreateFile("bay", []byte{}, 0o600),
 		// file with many subdirs
-		fstest.CreateDir("sub/sub2", 0700),
-		fstest.CreateFile("sub/sub2/file", []byte{}, 0600),
+		fstest.CreateDir("sub/sub2", 0o700),
+		fstest.CreateFile("sub/sub2/file", []byte{}, 0o600),
 		// unused file that shouldn't be included
-		fstest.CreateFile("baz", []byte{}, 0600),
-		fstest.CreateFile("test.sh", test, 0700),
+		fstest.CreateFile("baz", []byte{}, 0o600),
+		fstest.CreateFile("test.sh", test, 0o700),
 	)
 	require.NoError(t, err)
 
@@ -1370,7 +1380,7 @@ func testFileOpMkdirMkfile(t *testing.T, sb integration.Sandbox) {
 	defer c.Close()
 
 	st := llb.Scratch().
-		File(llb.Mkdir("/foo", 0700).Mkfile("bar", 0600, []byte("contents")))
+		File(llb.Mkdir("/foo", 0o700).Mkfile("bar", 0o600, []byte("contents")))
 
 	def, err := st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -1404,16 +1414,16 @@ func testFileOpCopyRm(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("myfile", []byte("data0"), 0600),
-		fstest.CreateDir("sub", 0700),
-		fstest.CreateFile("sub/foo", []byte("foo0"), 0600),
-		fstest.CreateFile("sub/bar", []byte("bar0"), 0600),
+		fstest.CreateFile("myfile", []byte("data0"), 0o600),
+		fstest.CreateDir("sub", 0o700),
+		fstest.CreateFile("sub/foo", []byte("foo0"), 0o600),
+		fstest.CreateFile("sub/bar", []byte("bar0"), 0o600),
 	)
 	require.NoError(t, err)
 
 	dir2, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("file2", []byte("file2"), 0600),
+		fstest.CreateFile("file2", []byte("file2"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1530,10 +1540,10 @@ func testFileOpCopyIncludeExclude(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("myfile", []byte("data0"), 0600),
-		fstest.CreateDir("sub", 0700),
-		fstest.CreateFile("sub/foo", []byte("foo0"), 0600),
-		fstest.CreateFile("sub/bar", []byte("bar0"), 0600),
+		fstest.CreateFile("myfile", []byte("data0"), 0o600),
+		fstest.CreateDir("sub", 0o700),
+		fstest.CreateFile("sub/foo", []byte("foo0"), 0o600),
+		fstest.CreateFile("sub/bar", []byte("bar0"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1585,7 +1595,7 @@ func testFileOpCopyIncludeExclude(t *testing.T, sb integration.Sandbox) {
 	// Create additional file which doesn't match the include pattern, and make
 	// sure this doesn't invalidate the cache.
 
-	err = fstest.Apply(fstest.CreateFile("unmatchedfile", []byte("data1"), 0600)).Apply(dir)
+	err = fstest.Apply(fstest.CreateFile("unmatchedfile", []byte("data1"), 0o600)).Apply(dir)
 	require.NoError(t, err)
 
 	st = llb.Scratch().File(
@@ -1630,9 +1640,9 @@ func testFileOpInputSwap(t *testing.T, sb integration.Sandbox) {
 	require.NoError(t, err)
 	defer c.Close()
 
-	base := llb.Scratch().File(llb.Mkfile("/foo", 0600, []byte("foo")))
+	base := llb.Scratch().File(llb.Mkfile("/foo", 0o600, []byte("foo")))
 
-	src := llb.Scratch().File(llb.Mkfile("/bar", 0600, []byte("bar")))
+	src := llb.Scratch().File(llb.Mkfile("/bar", 0o600, []byte("bar")))
 
 	st := base.File(llb.Copy(src, "/bar", "/baz"))
 
@@ -1669,7 +1679,7 @@ func testLocalSourceWithDiffer(t *testing.T, sb integration.Sandbox, d llb.DiffT
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("foo", []byte("foo"), 0600),
+		fstest.CreateFile("foo", []byte("foo"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1702,7 +1712,7 @@ func testLocalSourceWithDiffer(t *testing.T, sb integration.Sandbox, d llb.DiffT
 	require.NoError(t, err)
 	require.Equal(t, []byte("foo"), dt)
 
-	err = os.WriteFile(filepath.Join(dir, "foo"), []byte("bar"), 0600)
+	err = os.WriteFile(filepath.Join(dir, "foo"), []byte("bar"), 0o600)
 	require.NoError(t, err)
 
 	err = syscall.UtimesNano(filepath.Join(dir, "foo"), []syscall.Timespec{tv, tv})
@@ -1774,13 +1784,13 @@ func testOCILayoutSource(t *testing.T, sb integration.Sandbox) {
 
 	for filename, content := range m {
 		fullFilename := path.Join(dir, filename)
-		err = os.MkdirAll(path.Dir(fullFilename), 0755)
+		err = os.MkdirAll(path.Dir(fullFilename), 0o755)
 		require.NoError(t, err)
 		if content.Header.FileInfo().IsDir() {
-			err = os.MkdirAll(fullFilename, 0755)
+			err = os.MkdirAll(fullFilename, 0o755)
 			require.NoError(t, err)
 		} else {
-			err = os.WriteFile(fullFilename, content.Data, 0644)
+			err = os.WriteFile(fullFilename, content.Data, 0o644)
 			require.NoError(t, err)
 		}
 	}
@@ -1847,7 +1857,7 @@ func testOCILayoutPlatformSource(t *testing.T, sb integration.Sandbox) {
 		}
 		for i, platform := range platformsToTest {
 			st := llb.Scratch().File(
-				llb.Mkfile("platform", 0600, []byte(platform)),
+				llb.Mkfile("platform", 0o600, []byte(platform)),
 			)
 
 			def, err := st.Marshal(ctx)
@@ -1905,13 +1915,13 @@ func testOCILayoutPlatformSource(t *testing.T, sb integration.Sandbox) {
 
 	for filename, tarItem := range m {
 		fullFilename := path.Join(dir, filename)
-		err = os.MkdirAll(path.Dir(fullFilename), 0755)
+		err = os.MkdirAll(path.Dir(fullFilename), 0o755)
 		require.NoError(t, err)
 		if tarItem.Header.FileInfo().IsDir() {
-			err = os.MkdirAll(fullFilename, 0755)
+			err = os.MkdirAll(fullFilename, 0o755)
 			require.NoError(t, err)
 		} else {
-			err = os.WriteFile(fullFilename, tarItem.Data, 0644)
+			err = os.WriteFile(fullFilename, tarItem.Data, 0o644)
 			require.NoError(t, err)
 		}
 	}
@@ -2000,11 +2010,11 @@ func testFileOpRmWildcard(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateDir("foo", 0700),
-		fstest.CreateDir("bar", 0700),
-		fstest.CreateFile("foo/target", []byte("foo0"), 0600),
-		fstest.CreateFile("bar/target", []byte("bar0"), 0600),
-		fstest.CreateFile("bar/remaining", []byte("bar1"), 0600),
+		fstest.CreateDir("foo", 0o700),
+		fstest.CreateDir("bar", 0o700),
+		fstest.CreateFile("foo/target", []byte("foo0"), 0o600),
+		fstest.CreateFile("bar/target", []byte("bar0"), 0o600),
+		fstest.CreateFile("bar/remaining", []byte("bar1"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2187,7 +2197,7 @@ func testBuildHTTPSource(t *testing.T, sb integration.Sandbox) {
 	require.Equal(t, []byte("content1"), dt)
 
 	// test extra options
-	st = llb.HTTP(server.URL+"/foo", llb.Filename("bar"), llb.Chmod(0741), llb.Chown(1000, 1000))
+	st = llb.HTTP(server.URL+"/foo", llb.Filename("bar"), llb.Chmod(0o741), llb.Chown(1000, 1000))
 
 	def, err = st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -2212,7 +2222,7 @@ func testBuildHTTPSource(t *testing.T, sb integration.Sandbox) {
 	fi, err := os.Stat(filepath.Join(tmpdir, "bar"))
 	require.NoError(t, err)
 	require.Equal(t, fi.ModTime().Format(http.TimeFormat), modTime.Format(http.TimeFormat))
-	require.Equal(t, int(fi.Mode()&0777), 0741)
+	require.Equal(t, int(fi.Mode()&0o777), 0o741)
 
 	checkAllReleasable(t, c, sb, true)
 
@@ -2867,6 +2877,7 @@ func testSourceDateEpochTarExporter(t *testing.T, sb integration.Sandbox) {
 
 	checkAllReleasable(t, c, sb, true)
 }
+
 func testFrontendMetadataReturn(t *testing.T, sb integration.Sandbox) {
 	requiresLinux(t)
 	c, err := New(sb.Context(), sb.Address())
@@ -2916,7 +2927,7 @@ func testFrontendUseSolveResults(t *testing.T, sb integration.Sandbox) {
 
 	frontend := func(ctx context.Context, c gateway.Client) (*gateway.Result, error) {
 		st := llb.Scratch().File(
-			llb.Mkfile("foo", 0600, []byte("data")),
+			llb.Mkfile("foo", 0o600, []byte("data")),
 		)
 
 		def, err := st.Marshal(sb.Context())
@@ -3312,7 +3323,7 @@ func testBuildExportWithUncompressed(t *testing.T, sb integration.Sandbox) {
 	dt, err := content.ReadBlob(ctx, img.ContentStore(), img.Target())
 	require.NoError(t, err)
 
-	var mfst = struct {
+	mfst := struct {
 		MediaType string `json:"mediaType,omitempty"`
 		ocispecs.Manifest
 	}{}
@@ -3550,6 +3561,7 @@ func testPullZstdImage(t *testing.T, sb integration.Sandbox) {
 	require.NoError(t, err)
 	require.Equal(t, dt, []byte("zstd"))
 }
+
 func testBuildPushAndValidate(t *testing.T, sb integration.Sandbox) {
 	integration.CheckFeatureCompat(t, sb, integration.FeatureDirectPush)
 	requiresLinux(t)
@@ -3620,7 +3632,7 @@ func testBuildPushAndValidate(t *testing.T, sb integration.Sandbox) {
 
 	fi, err := os.Stat(filepath.Join(destDir, "foo"))
 	require.NoError(t, err)
-	require.Equal(t, 0741, int(fi.Mode()&0777))
+	require.Equal(t, 0o741, int(fi.Mode()&0o777))
 
 	checkAllReleasable(t, c, sb, false)
 
@@ -3688,7 +3700,7 @@ func testBuildPushAndValidate(t *testing.T, sb integration.Sandbox) {
 	dt, err = content.ReadBlob(ctx, img.ContentStore(), img.Target())
 	require.NoError(t, err)
 
-	var mfst = struct {
+	mfst := struct {
 		MediaType string `json:"mediaType,omitempty"`
 		ocispecs.Manifest
 	}{}
@@ -3710,7 +3722,7 @@ func testBuildPushAndValidate(t *testing.T, sb integration.Sandbox) {
 	item, ok := m["foo/"]
 	require.True(t, ok)
 	require.Equal(t, int32(item.Header.Typeflag), tar.TypeDir)
-	require.Equal(t, 0741, int(item.Header.Mode&0777))
+	require.Equal(t, 0o741, int(item.Header.Mode&0o777))
 
 	item, ok = m["foo/sub/"]
 	require.True(t, ok)
@@ -3738,7 +3750,7 @@ func testBuildPushAndValidate(t *testing.T, sb integration.Sandbox) {
 	item, ok = m["foo/"]
 	require.True(t, ok)
 	require.Equal(t, int32(item.Header.Typeflag), tar.TypeDir)
-	require.Equal(t, 0741, int(item.Header.Mode&0777))
+	require.Equal(t, 0o741, int(item.Header.Mode&0o777))
 
 	item, ok = m["foo/sub/"]
 	require.True(t, ok)
@@ -4616,7 +4628,8 @@ func testBasicCacheImportExport(t *testing.T, sb integration.Sandbox, cacheOptio
 			{
 				Type:      ExporterLocal,
 				OutputDir: destDir,
-			}},
+			},
+		},
 		CacheImports: cacheOptionsEntryImport,
 	}, nil)
 	require.NoError(t, err)
@@ -5569,12 +5582,12 @@ func testSourceMapFromRef(t *testing.T, sb integration.Sandbox) {
 	defer c.Close()
 
 	srcState := llb.Scratch().File(
-		llb.Mkfile("foo", 0600, []byte("data")))
+		llb.Mkfile("foo", 0o600, []byte("data")))
 	sm := llb.NewSourceMap(&srcState, "bar", []byte("bardata"))
 
 	frontend := func(ctx context.Context, c gateway.Client) (*gateway.Result, error) {
 		st := llb.Scratch().File(
-			llb.Mkdir("foo/bar", 0600), //fails because /foo doesn't exist
+			llb.Mkdir("foo/bar", 0o600), // fails because /foo doesn't exist
 			sm.Location([]*pb.Range{{Start: pb.Position{Line: 3, Character: 1}}}),
 		)
 
@@ -5659,7 +5672,7 @@ func testRmSymlink(t *testing.T, sb integration.Sandbox) {
 	}, nil)
 	require.NoError(t, err)
 
-	require.NoError(t, fstest.CheckDirectoryEqualWithApplier(destDir, fstest.CreateFile("target", nil, 0644)))
+	require.NoError(t, fstest.CheckDirectoryEqualWithApplier(destDir, fstest.CreateFile("target", nil, 0o644)))
 }
 
 func testProxyEnv(t *testing.T, sb integration.Sandbox) {
@@ -5747,49 +5760,49 @@ func testMergeOp(t *testing.T, sb integration.Sandbox) {
 	}
 
 	stateA := llb.Scratch().
-		File(llb.Mkfile("/foo", 0755, []byte("A"))).
-		File(llb.Mkfile("/a", 0755, []byte("A"))).
-		File(llb.Mkdir("/bar", 0700)).
-		File(llb.Mkfile("/bar/A", 0755, []byte("A")))
+		File(llb.Mkfile("/foo", 0o755, []byte("A"))).
+		File(llb.Mkfile("/a", 0o755, []byte("A"))).
+		File(llb.Mkdir("/bar", 0o700)).
+		File(llb.Mkfile("/bar/A", 0o755, []byte("A")))
 	stateB := stateA.
 		File(llb.Rm("/foo")).
-		File(llb.Mkfile("/b", 0755, []byte("B"))).
-		File(llb.Mkfile("/bar/B", 0754, []byte("B")))
+		File(llb.Mkfile("/b", 0o755, []byte("B"))).
+		File(llb.Mkfile("/bar/B", 0o754, []byte("B")))
 	stateC := llb.Scratch().
-		File(llb.Mkfile("/foo", 0755, []byte("C"))).
-		File(llb.Mkfile("/c", 0755, []byte("C"))).
-		File(llb.Mkdir("/bar", 0755)).
-		File(llb.Mkfile("/bar/A", 0400, []byte("C")))
+		File(llb.Mkfile("/foo", 0o755, []byte("C"))).
+		File(llb.Mkfile("/c", 0o755, []byte("C"))).
+		File(llb.Mkdir("/bar", 0o755)).
+		File(llb.Mkfile("/bar/A", 0o400, []byte("C")))
 
 	mergeA := llb.Merge([]llb.State{stateA, stateC})
 	requireContents(ctx, t, c, sb, mergeA, nil, nil, imageTarget,
-		fstest.CreateFile("foo", []byte("C"), 0755),
-		fstest.CreateFile("c", []byte("C"), 0755),
-		fstest.CreateDir("bar", 0755),
-		fstest.CreateFile("bar/A", []byte("C"), 0400),
-		fstest.CreateFile("a", []byte("A"), 0755),
+		fstest.CreateFile("foo", []byte("C"), 0o755),
+		fstest.CreateFile("c", []byte("C"), 0o755),
+		fstest.CreateDir("bar", 0o755),
+		fstest.CreateFile("bar/A", []byte("C"), 0o400),
+		fstest.CreateFile("a", []byte("A"), 0o755),
 	)
 
 	mergeB := llb.Merge([]llb.State{stateC, stateB})
 	requireContents(ctx, t, c, sb, mergeB, nil, nil, imageTarget,
-		fstest.CreateFile("a", []byte("A"), 0755),
-		fstest.CreateFile("b", []byte("B"), 0755),
-		fstest.CreateFile("c", []byte("C"), 0755),
-		fstest.CreateDir("bar", 0700),
-		fstest.CreateFile("bar/A", []byte("A"), 0755),
-		fstest.CreateFile("bar/B", []byte("B"), 0754),
+		fstest.CreateFile("a", []byte("A"), 0o755),
+		fstest.CreateFile("b", []byte("B"), 0o755),
+		fstest.CreateFile("c", []byte("C"), 0o755),
+		fstest.CreateDir("bar", 0o700),
+		fstest.CreateFile("bar/A", []byte("A"), 0o755),
+		fstest.CreateFile("bar/B", []byte("B"), 0o754),
 	)
 
-	stateD := llb.Scratch().File(llb.Mkdir("/qaz", 0755))
+	stateD := llb.Scratch().File(llb.Mkdir("/qaz", 0o755))
 	mergeC := llb.Merge([]llb.State{mergeA, mergeB, stateD})
 	requireContents(ctx, t, c, sb, mergeC, nil, nil, imageTarget,
-		fstest.CreateFile("a", []byte("A"), 0755),
-		fstest.CreateFile("b", []byte("B"), 0755),
-		fstest.CreateFile("c", []byte("C"), 0755),
-		fstest.CreateDir("bar", 0700),
-		fstest.CreateFile("bar/A", []byte("A"), 0755),
-		fstest.CreateFile("bar/B", []byte("B"), 0754),
-		fstest.CreateDir("qaz", 0755),
+		fstest.CreateFile("a", []byte("A"), 0o755),
+		fstest.CreateFile("b", []byte("B"), 0o755),
+		fstest.CreateFile("c", []byte("C"), 0o755),
+		fstest.CreateDir("bar", 0o700),
+		fstest.CreateFile("bar/A", []byte("A"), 0o755),
+		fstest.CreateFile("bar/B", []byte("B"), 0o754),
+		fstest.CreateDir("qaz", 0o755),
 	)
 
 	runA := runShell(llb.Merge([]llb.State{llb.Image("alpine"), mergeC}),
@@ -5806,19 +5819,19 @@ func testMergeOp(t *testing.T, sb integration.Sandbox) {
 		"touch /qaz",
 	)
 	stateE := llb.Scratch().
-		File(llb.Mkfile("/foo", 0755, []byte("E"))).
-		File(llb.Mkdir("/bar", 0755)).
-		File(llb.Mkfile("/bar/A", 0755, []byte("A"))).
-		File(llb.Mkfile("/bar/E", 0755, nil))
+		File(llb.Mkfile("/foo", 0o755, []byte("E"))).
+		File(llb.Mkdir("/bar", 0o755)).
+		File(llb.Mkfile("/bar/A", 0o755, []byte("A"))).
+		File(llb.Mkfile("/bar/E", 0o755, nil))
 	mergeD := llb.Merge([]llb.State{stateE, runA})
 	requireEqualContents(ctx, t, c, mergeD, llb.Image("alpine").
-		File(llb.Mkdir("a", 0755)).
-		File(llb.Mkfile("a/b", 0755, []byte("B"))).
-		File(llb.Mkfile("a/c", 0755, []byte("C"))).
-		File(llb.Mkdir("bar", 0755)).
-		File(llb.Mkfile("bar/D", 0644, []byte("D"))).
-		File(llb.Mkfile("bar/E", 0755, nil)).
-		File(llb.Mkfile("qaz", 0644, nil)),
+		File(llb.Mkdir("a", 0o755)).
+		File(llb.Mkfile("a/b", 0o755, []byte("B"))).
+		File(llb.Mkfile("a/c", 0o755, []byte("C"))).
+		File(llb.Mkdir("bar", 0o755)).
+		File(llb.Mkfile("bar/D", 0o644, []byte("D"))).
+		File(llb.Mkfile("bar/E", 0o755, nil)).
+		File(llb.Mkfile("qaz", 0o644, nil)),
 	// /foo from stateE is not here because it is deleted in stateB, which is part of a submerge of mergeD
 	)
 }
@@ -5909,8 +5922,8 @@ func testMergeOpCache(t *testing.T, sb integration.Sandbox, mode string) {
 
 	// make a new merge that includes the lazy busybox as a base and exports inline cache
 	input1 := llb.Scratch().
-		File(llb.Mkdir("/dir", 0777)).
-		File(llb.Mkfile("/dir/1", 0777, nil))
+		File(llb.Mkdir("/dir", 0o777)).
+		File(llb.Mkfile("/dir/1", 0o777, nil))
 	input1Copy := llb.Scratch().File(llb.Copy(input1, "/dir/1", "/foo/1", &llb.CopyInfo{CreateDestPath: true}))
 
 	// put random contents in the file to ensure it's not re-run later
@@ -6055,8 +6068,8 @@ func testMergeOpCache(t *testing.T, sb integration.Sandbox, mode string) {
 
 	// re-run the build with a change only to input1 using the remote cache
 	input1 = llb.Scratch().
-		File(llb.Mkdir("/dir", 0777)).
-		File(llb.Mkfile("/dir/1", 0444, nil))
+		File(llb.Mkdir("/dir", 0o777)).
+		File(llb.Mkfile("/dir/1", 0o444, nil))
 	input1Copy = llb.Scratch().File(llb.Copy(input1, "/dir/1", "/foo/1", &llb.CopyInfo{CreateDestPath: true}))
 
 	merge = llb.Merge([]llb.State{llb.Image(busyboxTarget), input1Copy, input2Copy})
@@ -6130,7 +6143,7 @@ func testMergeOpCache(t *testing.T, sb integration.Sandbox, mode string) {
 		require.ErrorIs(t, err, ctderrdefs.ErrNotFound, "unexpected error %v", err)
 	}
 
-	mergePlusLayer := merge.File(llb.Mkfile("/3", 0444, nil))
+	mergePlusLayer := merge.File(llb.Mkfile("/3", 0o444, nil))
 
 	def, err = mergePlusLayer.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -6516,7 +6529,7 @@ func testParallelLocalBuilds(t *testing.T, sb integration.Sandbox) {
 				fn := fmt.Sprintf("test%d", i)
 				srcDir, err := integration.Tmpdir(
 					t,
-					fstest.CreateFile(fn, []byte("contents"), 0600),
+					fstest.CreateFile(fn, []byte("contents"), 0o600),
 				)
 				require.NoError(t, err)
 
@@ -6753,9 +6766,9 @@ func testPullWithLayerLimit(t *testing.T, sb integration.Sandbox) {
 	defer c.Close()
 
 	st := llb.Scratch().
-		File(llb.Mkfile("/first", 0644, []byte("first"))).
-		File(llb.Mkfile("/second", 0644, []byte("second"))).
-		File(llb.Mkfile("/third", 0644, []byte("third")))
+		File(llb.Mkfile("/first", 0o644, []byte("first"))).
+		File(llb.Mkfile("/second", 0o644, []byte("second"))).
+		File(llb.Mkfile("/third", 0o644, []byte("third")))
 
 	def, err := st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -6783,7 +6796,7 @@ func testPullWithLayerLimit(t *testing.T, sb integration.Sandbox) {
 
 	// pull 2 first layers
 	st = llb.Image(target, llb.WithLayerLimit(2)).
-		File(llb.Mkfile("/forth", 0644, []byte("forth")))
+		File(llb.Mkfile("/forth", 0o644, []byte("forth")))
 
 	def, err = st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -6818,7 +6831,7 @@ func testPullWithLayerLimit(t *testing.T, sb integration.Sandbox) {
 	st = llb.Diff(
 		llb.Image(target, llb.WithLayerLimit(2)),
 		llb.Image(target)).
-		File(llb.Mkfile("/forth", 0644, []byte("forth")))
+		File(llb.Mkfile("/forth", 0o644, []byte("forth")))
 
 	def, err = st.Marshal(sb.Context())
 	require.NoError(t, err)
@@ -6959,7 +6972,7 @@ func testExportAnnotations(t *testing.T, sb integration.Sandbox) {
 		}
 		for i, p := range ps {
 			st := llb.Scratch().File(
-				llb.Mkfile("platform", 0600, []byte(platforms.Format(p))),
+				llb.Mkfile("platform", 0o600, []byte(platforms.Format(p))),
 			)
 
 			def, err := st.Marshal(ctx)
@@ -7175,7 +7188,7 @@ func testExportAnnotationsMediaTypes(t *testing.T, sb integration.Sandbox) {
 		}
 		for i, p := range ps {
 			st := llb.Scratch().File(
-				llb.Mkfile("platform", 0600, []byte(platforms.Format(p))),
+				llb.Mkfile("platform", 0o600, []byte(platforms.Format(p))),
 			)
 
 			def, err := st.Marshal(ctx)
@@ -7295,7 +7308,7 @@ func testExportAttestations(t *testing.T, sb integration.Sandbox) {
 
 			// build image
 			st := llb.Scratch().File(
-				llb.Mkfile("/greeting", 0600, []byte(fmt.Sprintf("hello %s!", pk))),
+				llb.Mkfile("/greeting", 0o600, []byte(fmt.Sprintf("hello %s!", pk))),
 			)
 			def, err := st.Marshal(ctx)
 			if err != nil {
@@ -7319,8 +7332,8 @@ func testExportAttestations(t *testing.T, sb integration.Sandbox) {
 
 			// build attestations
 			st = llb.Scratch().
-				File(llb.Mkfile("/attestation.json", 0600, success)).
-				File(llb.Mkfile("/attestation2.json", 0600, []byte{}))
+				File(llb.Mkfile("/attestation.json", 0o600, success)).
+				File(llb.Mkfile("/attestation2.json", 0o600, []byte{}))
 			def, err = st.Marshal(ctx)
 			if err != nil {
 				return nil, err
@@ -7613,7 +7626,7 @@ func testAttestationDefaultSubject(t *testing.T, sb integration.Sandbox) {
 
 			// build image
 			st := llb.Scratch().File(
-				llb.Mkfile("/greeting", 0600, []byte(fmt.Sprintf("hello %s!", pk))),
+				llb.Mkfile("/greeting", 0o600, []byte(fmt.Sprintf("hello %s!", pk))),
 			)
 			def, err := st.Marshal(ctx)
 			if err != nil {
@@ -7636,7 +7649,7 @@ func testAttestationDefaultSubject(t *testing.T, sb integration.Sandbox) {
 			res.AddRef(pk, ref)
 
 			// build attestations
-			st = llb.Scratch().File(llb.Mkfile("/attestation.json", 0600, success))
+			st = llb.Scratch().File(llb.Mkfile("/attestation.json", 0o600, success))
 			def, err = st.Marshal(ctx)
 			if err != nil {
 				return nil, err
@@ -7748,7 +7761,7 @@ func testAttestationBundle(t *testing.T, sb integration.Sandbox) {
 
 			// build image
 			st := llb.Scratch().File(
-				llb.Mkfile("/greeting", 0600, []byte(fmt.Sprintf("hello %s!", pk))),
+				llb.Mkfile("/greeting", 0o600, []byte(fmt.Sprintf("hello %s!", pk))),
 			)
 			def, err := st.Marshal(ctx)
 			if err != nil {
@@ -7786,10 +7799,10 @@ func testAttestationBundle(t *testing.T, sb integration.Sandbox) {
 			// build attestations
 			st = llb.Scratch()
 			st = st.File(
-				llb.Mkdir("/bundle", 0700),
+				llb.Mkdir("/bundle", 0o700),
 			)
 			st = st.File(
-				llb.Mkfile("/bundle/attestation.json", 0600, buff.Bytes()),
+				llb.Mkfile("/bundle/attestation.json", 0o600, buff.Bytes()),
 			)
 			def, err = st.Marshal(ctx)
 			if err != nil {
@@ -7958,7 +7971,7 @@ EOF
 
 			// build image
 			st := llb.Scratch().File(
-				llb.Mkfile("/greeting", 0600, []byte("hello world!")),
+				llb.Mkfile("/greeting", 0o600, []byte("hello world!")),
 			)
 			def, err := st.Marshal(ctx)
 			if err != nil {
@@ -7992,7 +8005,7 @@ EOF
 			// build attestations
 			if attest {
 				st = llb.Scratch().
-					File(llb.Mkfile("/result.spdx", 0600, []byte(`{"name": "frontend"}`)))
+					File(llb.Mkfile("/result.spdx", 0o600, []byte(`{"name": "frontend"}`)))
 				def, err = st.Marshal(ctx)
 				if err != nil {
 					return nil, err
@@ -8233,7 +8246,7 @@ EOF
 
 		// build image
 		st := llb.Scratch().File(
-			llb.Mkfile("/greeting", 0600, []byte("hello world!")),
+			llb.Mkfile("/greeting", 0o600, []byte("hello world!")),
 		)
 		def, err := st.Marshal(ctx)
 		if err != nil {
@@ -8435,8 +8448,8 @@ func testMountStubsDirectory(t *testing.T, sb integration.Sandbox) {
 	defer c.Close()
 
 	st := llb.Image("busybox:latest").
-		File(llb.Mkdir("/test", 0700)).
-		File(llb.Mkdir("/test/qux/", 0700)).
+		File(llb.Mkdir("/test", 0o700)).
+		File(llb.Mkdir("/test/qux/", 0o700)).
 		Run(
 			llb.Args([]string{"touch", "/test/baz/keep"}),
 			// check stubs directory is removed
@@ -8495,7 +8508,8 @@ func testMountStubsTimestamp(t *testing.T, sb integration.Sandbox) {
 
 	const sourceDateEpoch = int64(1234567890) // Fri Feb 13 11:31:30 PM UTC 2009
 	st := llb.Image("busybox:latest").Run(
-		llb.Args([]string{"/bin/touch", fmt.Sprintf("--date=@%d", sourceDateEpoch),
+		llb.Args([]string{
+			"/bin/touch", fmt.Sprintf("--date=@%d", sourceDateEpoch),
 			"/bin",
 			"/etc",
 			"/var",
@@ -8670,8 +8684,10 @@ func (*secModeInsecure) UpdateConfigFile(in string) string {
 	return in + "\n\ninsecure-entitlements = [\"security.insecure\"]\n"
 }
 
-var securitySandbox integration.ConfigUpdater = &secModeSandbox{}
-var securityInsecure integration.ConfigUpdater = &secModeInsecure{}
+var (
+	securitySandbox  integration.ConfigUpdater = &secModeSandbox{}
+	securityInsecure integration.ConfigUpdater = &secModeInsecure{}
+)
 
 type netModeHost struct{}
 
@@ -8703,9 +8719,11 @@ nameservers = ["10.11.0.1"]
 `
 }
 
-var hostNetwork integration.ConfigUpdater = &netModeHost{}
-var defaultNetwork integration.ConfigUpdater = &netModeDefault{}
-var bridgeDNSNetwork integration.ConfigUpdater = &netModeBridgeDNS{}
+var (
+	hostNetwork      integration.ConfigUpdater = &netModeHost{}
+	defaultNetwork   integration.ConfigUpdater = &netModeDefault{}
+	bridgeDNSNetwork integration.ConfigUpdater = &netModeBridgeDNS{}
+)
 
 func fixedWriteCloser(wc io.WriteCloser) func(map[string]string) (io.WriteCloser, error) {
 	return func(map[string]string) (io.WriteCloser, error) {

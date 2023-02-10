@@ -1,25 +1,49 @@
 //devcontainer.json
 {
     "name": "buildkit",
+    "runArgs": [
+        "--privileged",
+        "-v", "gotools:/gotools",
+        "-v", "buildkit-cache:/root/.cache",
+        "-v", "buildkit-registry-cache:/root/.cache/registry",
+        "-v", "buildkit-gomod-cache:/go/pkg/mod",
+        "-v", "/tmp",
+        "-e", "BUILDKIT_REGISTRY_MIRROR_DIR=/root/.cache/registry"
+    ],
     "build": {
         "dockerfile": "../Dockerfile",
         "context": "..",
-        "target": "integration-tests",
-        "args": {
-            "RUNC_VERSION":"v1.1.4",
-            "CONTAINERD_VERSION":"v1.7.0-beta.3",
-            "CONTAINERD_ALT_VERSION_16":"v1.6.16",
-            "REGISTRY_VERSION":"2.8.0",
-            "ROOTLESSKIT_VERSION":"v1.0.1",
-            "CNI_VERSION":"v1.2.0",
-            "STARGZ_SNAPSHOTTER_VERSION":"v0.13.0",
-            "NERDCTL_VERSION":"v1.0.0",
-            "DNSNAME_VERSION":"v1.3.1",
-            "NYDUS_VERSION":"v2.1.0",
-            "MINIO_VERSION":"RELEASE.2022-05-03T20-36-08Z",
-            "MINIO_MC_VERSION":"RELEASE.2022-05-04T06-07-55Z",
-            "AZURITE_VERSION":"3.18.0",
-            "ALPINE_VERSION":"3.17"
+        "target": "dev-env"
+        // ,
+        // "args": {
+        //     "RUNC_VERSION":"v1.1.4",
+        //     "CONTAINERD_VERSION":"v1.7.0-beta.3",
+        //     "CONTAINERD_ALT_VERSION_16":"v1.6.16",
+        //     "REGISTRY_VERSION":"2.8.0",
+        //     "ROOTLESSKIT_VERSION":"v1.0.1",
+        //     "CNI_VERSION":"v1.2.0",
+        //     "STARGZ_SNAPSHOTTER_VERSION":"v0.13.0",
+        //     "NERDCTL_VERSION":"v1.0.0",
+        //     "DNSNAME_VERSION":"v1.3.1",
+        //     "NYDUS_VERSION":"v2.1.0",
+        //     "MINIO_VERSION":"RELEASE.2022-05-03T20-36-08Z",
+        //     "MINIO_MC_VERSION":"RELEASE.2022-05-04T06-07-55Z",
+        //     "AZURITE_VERSION":"3.18.0",
+        //     "ALPINE_VERSION":"3.17"
+        // }
+	},
+    // "postCreateCommand": ".devcontainer/postCreateCommand.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"golang.go"
+            ],
+            "settings": {
+                "go.toolsGopath": "/gotools",
+                "go.toolsEnvVars": {
+                    "GOBIN": "/gotools/bin"
+                }
+            }
         }
-    }
+	}
 }
