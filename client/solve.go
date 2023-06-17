@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -101,8 +102,8 @@ func (c *Client) solve(ctx context.Context, def *llb.Definition, runGateway runG
 	}
 	eg, ctx := errgroup.WithContext(ctx)
 
-	statusContext, cancelStatus := context.WithCancel(context.Background())
-	defer cancelStatus()
+	statusContext, cancelStatus := context.WithCancelCause(context.Background())
+	defer cancelStatus(context.Canceled)
 
 	if span := trace.SpanFromContext(ctx); span.SpanContext().IsValid() {
 		statusContext = trace.ContextWithSpan(statusContext, span)
@@ -190,7 +191,7 @@ func (c *Client) solve(ctx context.Context, def *llb.Definition, runGateway runG
 			}
 			switch ex.Type {
 			case ExporterOCI, ExporterDocker:
-				if err := os.MkdirAll(ex.OutputDir, 0755); err != nil {
+				if err := os.MkdirAll(ex.OutputDir, 0o755); err != nil {
 					return nil, err
 				}
 				cs, err := contentlocal.NewStore(ex.OutputDir)
@@ -234,7 +235,7 @@ func (c *Client) solve(ctx context.Context, def *llb.Definition, runGateway runG
 		defer func() { // make sure the Status ends cleanly on build errors
 			go func() {
 				<-time.After(3 * time.Second)
-				cancelStatus()
+				cancelStatus(fmt.Errorf("context canceled 3s after completed solve"))
 			}()
 			if !opt.SessionPreInitialized {
 				bklog.G(ctx).Debugf("stopping session")
@@ -432,7 +433,7 @@ func parseCacheOptions(ctx context.Context, isGateway bool, opt SolveOpt) (*cach
 			if csDir == "" {
 				return nil, errors.New("local cache exporter requires dest")
 			}
-			if err := os.MkdirAll(csDir, 0755); err != nil {
+			if err := os.MkdirAll(csDir, 0o755); err != nil {
 				return nil, err
 			}
 			cs, err := contentlocal.NewStore(csDir)
