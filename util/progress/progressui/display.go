@@ -83,7 +83,7 @@ func DisplaySolveStatus(ctx context.Context, c console.Console, w io.Writer, ch 
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return nil, context.Cause(ctx)
 		case <-ticker.C:
 		case ss, ok := <-ch:
 			if ok {
@@ -118,8 +118,10 @@ func DisplaySolveStatus(ctx context.Context, c console.Console, w io.Writer, ch 
 	}
 }
 
-const termHeight = 6
-const termPad = 10
+const (
+	termHeight = 6
+	termPad    = 10
+)
 
 type displayInfo struct {
 	startTime      time.Time

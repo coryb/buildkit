@@ -769,7 +769,7 @@ func (s *sharedOp) CalcSlowCache(ctx context.Context, index Index, p PreprocessF
 				if errdefs.IsCanceled(ctx, err) {
 					complete = false
 					releaseError(err)
-					err = errors.Wrap(ctx.Err(), err.Error())
+					err = errors.Wrap(context.Cause(ctx), err.Error())
 				}
 			default:
 			}
@@ -835,7 +835,7 @@ func (s *sharedOp) CacheMap(ctx context.Context, index int) (resp *cacheMapResp,
 				if errdefs.IsCanceled(ctx, err) {
 					complete = false
 					releaseError(err)
-					err = errors.Wrap(ctx.Err(), err.Error())
+					err = errors.Wrap(context.Cause(ctx), err.Error())
 				}
 			default:
 			}
@@ -914,7 +914,7 @@ func (s *sharedOp) Exec(ctx context.Context, inputs []Result) (outputs []Result,
 				if errdefs.IsCanceled(ctx, err) {
 					complete = false
 					releaseError(err)
-					err = errors.Wrap(ctx.Err(), err.Error())
+					err = errors.Wrap(context.Cause(ctx), err.Error())
 				}
 			default:
 			}

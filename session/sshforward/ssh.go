@@ -26,7 +26,7 @@ func (s *server) run(ctx context.Context, l net.Listener, id string) error {
 
 	eg.Go(func() error {
 		<-ctx.Done()
-		return ctx.Err()
+		return context.Cause(ctx)
 	})
 
 	eg.Go(func() error {
@@ -74,7 +74,7 @@ func MountSSHSocket(ctx context.Context, c session.Caller, opt SocketOpt) (sockP
 		}
 	}()
 
-	if err := os.Chmod(dir, 0711); err != nil {
+	if err := os.Chmod(dir, 0o711); err != nil {
 		return "", nil, errors.WithStack(err)
 	}
 

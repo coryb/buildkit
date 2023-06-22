@@ -174,7 +174,7 @@ func (c *call) wait(ctx context.Context) (v interface{}, err error) {
 		if ok {
 			c.progressState.close(pw)
 		}
-		return nil, ctx.Err()
+		return nil, context.Cause(ctx)
 	case <-c.ready:
 		return c.result, c.err // shared not implemented yet
 	}
@@ -261,7 +261,7 @@ func (sc *sharedContext) checkDone() bool {
 	for _, ctx := range sc.ctxs {
 		select {
 		case <-ctx.Done():
-			err = ctx.Err()
+			err = context.Cause(ctx)
 		default:
 			sc.mu.Unlock()
 			return false

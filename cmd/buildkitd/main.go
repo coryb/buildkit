@@ -257,7 +257,7 @@ func main() {
 		}
 		cfg.Root = root
 
-		if err := os.MkdirAll(root, 0700); err != nil {
+		if err := os.MkdirAll(root, 0o700); err != nil {
 			return errors.Wrapf(err, "failed to create %s", root)
 		}
 
@@ -323,7 +323,7 @@ func main() {
 			err = serverErr
 			cancel()
 		case <-ctx.Done():
-			err = ctx.Err()
+			err = context.Cause(ctx)
 		}
 
 		bklog.G(ctx).Infof("stopping server")
@@ -684,7 +684,7 @@ func newController(c *cli.Context, cfg *config.Config) (*control.Controller, err
 		return nil, err
 	}
 
-	historyDB, err := bbolt.Open(filepath.Join(cfg.Root, "history.db"), 0600, nil)
+	historyDB, err := bbolt.Open(filepath.Join(cfg.Root, "history.db"), 0o600, nil)
 	if err != nil {
 		return nil, err
 	}

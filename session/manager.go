@@ -173,7 +173,7 @@ func (sm *Manager) Get(ctx context.Context, id string, noWait bool) (Caller, err
 		select {
 		case <-ctx.Done():
 			sm.mu.Unlock()
-			return nil, errors.Wrapf(ctx.Err(), "no active session for %s", id)
+			return nil, errors.Wrapf(context.Cause(ctx), "no active session for %s", id)
 		default:
 		}
 		var ok bool
@@ -209,6 +209,7 @@ func (c *client) Supports(url string) bool {
 	_, ok := c.supported[strings.ToLower(url)]
 	return ok
 }
+
 func (c *client) Conn() *grpc.ClientConn {
 	return c.cc
 }

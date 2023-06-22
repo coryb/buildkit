@@ -136,7 +136,7 @@ func (g *cacheRefGetter) getRefCacheDirNoCache(ctx context.Context, key string, 
 			select {
 			case <-ctx.Done():
 				cacheRefsLocker.Lock(key)
-				return nil, ctx.Err()
+				return nil, context.Cause(ctx)
 			case <-time.After(100 * time.Millisecond):
 				cacheRefsLocker.Lock(key)
 			}
@@ -221,7 +221,7 @@ func (sm *sshMountInstance) Mount() ([]mount.Mount, func() error, error) {
 		ID:   sm.sm.mount.SSHOpt.ID,
 		UID:  uid,
 		GID:  gid,
-		Mode: int(sm.sm.mount.SSHOpt.Mode & 0777),
+		Mode: int(sm.sm.mount.SSHOpt.Mode & 0o777),
 	})
 	if err != nil {
 		cancel()
@@ -300,7 +300,7 @@ func (sm *secretMountInstance) Mount() ([]mount.Mount, func() error, error) {
 		return os.RemoveAll(dir)
 	}
 
-	if err := os.Chmod(dir, 0711); err != nil {
+	if err := os.Chmod(dir, 0o711); err != nil {
 		cleanupDir()
 		return nil, nil, err
 	}
@@ -330,7 +330,7 @@ func (sm *secretMountInstance) Mount() ([]mount.Mount, func() error, error) {
 
 	randID := identity.NewID()
 	fp := filepath.Join(dir, randID)
-	if err := os.WriteFile(fp, sm.sm.data, 0600); err != nil {
+	if err := os.WriteFile(fp, sm.sm.data, 0o600); err != nil {
 		cleanup()
 		return nil, nil, err
 	}
@@ -356,7 +356,7 @@ func (sm *secretMountInstance) Mount() ([]mount.Mount, func() error, error) {
 		return nil, nil, err
 	}
 
-	if err := os.Chmod(fp, os.FileMode(sm.sm.mount.SecretOpt.Mode&0777)); err != nil {
+	if err := os.Chmod(fp, os.FileMode(sm.sm.mount.SecretOpt.Mode&0o777)); err != nil {
 		cleanup()
 		return nil, nil, err
 	}
@@ -431,8 +431,10 @@ func (m *tmpfsMount) IdentityMapping() *idtools.IdentityMapping {
 	return m.idmap
 }
 
-var cacheRefsLocker = locker.New()
-var sharedCacheRefs = &cacheRefs{}
+var (
+	cacheRefsLocker = locker.New()
+	sharedCacheRefs = &cacheRefs{}
+)
 
 type cacheRefs struct {
 	mu     sync.Mutex
@@ -506,8 +508,10 @@ func (r *cacheRefShare) release(ctx context.Context) error {
 	return r.MutableRef.Release(ctx)
 }
 
-var cacheRefReleaseHijack func()
-var cacheRefCloneHijack func()
+var (
+	cacheRefReleaseHijack func()
+	cacheRefCloneHijack   func()
+)
 
 type cacheRef struct {
 	*cacheRefShare
@@ -534,8 +538,10 @@ func (r *cacheRef) Release(ctx context.Context) error {
 	return nil
 }
 
-const keyCacheDir = "cache-dir"
-const cacheDirIndex = keyCacheDir + ":"
+const (
+	keyCacheDir   = "cache-dir"
+	cacheDirIndex = keyCacheDir + ":"
+)
 
 func SearchCacheDir(ctx context.Context, store cache.MetadataStore, id string) ([]CacheRefMetadata, error) {
 	var results []CacheRefMetadata

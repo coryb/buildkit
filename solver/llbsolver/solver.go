@@ -467,7 +467,7 @@ func (s *Solver) Solve(ctx context.Context, id string, sessionID string, req fro
 		case <-fwd.Done():
 			res, err = fwd.Result()
 		case <-ctx.Done():
-			err = ctx.Err()
+			err = context.Cause(ctx)
 		}
 		if err != nil {
 			return nil, err

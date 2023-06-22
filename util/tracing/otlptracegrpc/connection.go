@@ -185,7 +185,7 @@ func (c *Connection) Shutdown(ctx context.Context) error {
 	select {
 	case <-c.backgroundConnectionDoneCh:
 	case <-ctx.Done():
-		return ctx.Err()
+		return context.Cause(ctx)
 	}
 
 	c.mu.Lock()

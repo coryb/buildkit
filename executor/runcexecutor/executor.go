@@ -616,7 +616,7 @@ func (p *procHandle) Shutdown() {
 func (p *procHandle) WaitForReady(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return ctx.Err()
+		return context.Cause(ctx)
 	case <-p.ready:
 		return nil
 	}

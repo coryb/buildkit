@@ -141,7 +141,7 @@ func (pr *progressReader) Read(ctx context.Context) ([]*Progress, error) {
 		select {
 		case <-ctx.Done():
 			pr.mu.Unlock()
-			return nil, ctx.Err()
+			return nil, context.Cause(ctx)
 		default:
 		}
 		dmap := pr.dirty

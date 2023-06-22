@@ -144,7 +144,7 @@ type cancellableWriter struct {
 }
 
 func (w *cancellableWriter) Write(p []byte) (int, error) {
-	if err := w.ctx.Err(); err != nil {
+	if err := context.Cause(w.ctx); err != nil {
 		return 0, err
 	}
 	return w.w.Write(p)
@@ -159,8 +159,8 @@ func Changes(ctx context.Context, changeFn fs.ChangeFunc, upperdir, upperdirView
 		if err != nil {
 			return err
 		}
-		if ctx.Err() != nil {
-			return ctx.Err()
+		if context.Cause(ctx) != nil {
+			return context.Cause(ctx)
 		}
 
 		// Rebase path
