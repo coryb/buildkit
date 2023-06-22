@@ -149,7 +149,7 @@ func (ce *exporter) uploadManifest(ctx context.Context, manifestKey string, read
 		return errors.Wrap(err, "error creating container client")
 	}
 
-	ctx, cnclFn := context.WithTimeout(ctx, time.Minute*5)
+	ctx, cnclFn := context.WithTimeoutCause(ctx, time.Minute*5, errors.Wrap(context.DeadlineExceeded, "uploadManifest"))
 	defer cnclFn()
 
 	_, err = blobClient.Upload(ctx, reader, &azblob.BlockBlobUploadOptions{})
@@ -169,7 +169,7 @@ func (ce *exporter) uploadBlobIfNotExists(ctx context.Context, blobKey string, r
 		return errors.Wrap(err, "error creating container client")
 	}
 
-	uploadCtx, cnclFn := context.WithTimeout(ctx, time.Minute*5)
+	uploadCtx, cnclFn := context.WithTimeoutCause(ctx, time.Minute*5, errors.Wrap(context.DeadlineExceeded, "uploadBlobIfNotExists"))
 	defer cnclFn()
 
 	// Only upload if the blob doesn't exist

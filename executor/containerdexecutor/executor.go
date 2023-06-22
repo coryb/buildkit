@@ -152,7 +152,7 @@ func (w *containerdExecutor) Run(ctx context.Context, id string, root executor.M
 		return errors.Wrapf(err, "working dir %s points to invalid target", newp)
 	}
 	if _, err := os.Stat(newp); err != nil {
-		if err := idtools.MkdirAllAndChown(newp, 0755, identity); err != nil {
+		if err := idtools.MkdirAllAndChown(newp, 0o755, identity); err != nil {
 			return errors.Wrapf(err, "failed to create working directory %s", newp)
 		}
 	}
@@ -412,7 +412,7 @@ func (w *containerdExecutor) runProcess(ctx context.Context, p containerd.Proces
 		case <-ctxDone:
 			ctxDone = nil
 			var killCtx context.Context
-			killCtx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+			killCtx, cancel = context.WithTimeoutCause(context.Background(), 10*time.Second, errors.Wrap(context.DeadlineExceeded, "runProcess"))
 			killCtxDone = killCtx.Done()
 			p.Kill(killCtx, syscall.SIGKILL)
 			io.Cancel()

@@ -71,7 +71,7 @@ func (c *client) UploadTraces(ctx context.Context, protoSpans []*tracepb.Resourc
 
 	ctx, cancel := c.connection.ContextWithStop(ctx)
 	defer cancel()
-	ctx, tCancel := context.WithTimeout(ctx, 30*time.Second)
+	ctx, tCancel := context.WithTimeoutCause(ctx, 30*time.Second, errors.Wrap(context.DeadlineExceeded, "UploadTraces"))
 	defer tCancel()
 
 	ctx = c.connection.ContextWithMetadata(ctx)

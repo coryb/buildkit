@@ -60,7 +60,7 @@ func (e *localExporter) Config() *exporter.Config {
 }
 
 func (e *localExporterInstance) Export(ctx context.Context, inp *exporter.Source, sessionID string) (map[string]string, exporter.DescriptorReference, error) {
-	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "local Export"))
 	defer cancel()
 
 	if e.opts.Epoch == nil {
@@ -106,7 +106,7 @@ func (e *localExporterInstance) Export(ctx context.Context, inp *exporter.Source
 			if isMap {
 				lbl += " " + k
 				st := fstypes.Stat{
-					Mode: uint32(os.ModeDir | 0755),
+					Mode: uint32(os.ModeDir | 0o755),
 					Path: strings.Replace(k, "/", "_", -1),
 				}
 				if e.opts.Epoch != nil {

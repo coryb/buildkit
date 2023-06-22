@@ -92,7 +92,7 @@ func (ls *localSourceHandler) Snapshot(ctx context.Context, g session.Group) (ca
 		return ls.snapshotWithAnySession(ctx, g)
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "local Snapshot"))
 	defer cancel()
 
 	caller, err := ls.sm.Get(timeoutCtx, sessionID, false)
@@ -280,8 +280,10 @@ func (cu *cacheUpdater) ContentHasher() fsutil.ContentHasher {
 	return contenthash.NewFromStat
 }
 
-const keySharedKey = "local.sharedKey"
-const sharedKeyIndex = keySharedKey + ":"
+const (
+	keySharedKey   = "local.sharedKey"
+	sharedKeyIndex = keySharedKey + ":"
+)
 
 func searchSharedKey(ctx context.Context, store cache.MetadataStore, k string) ([]cacheRefMetadata, error) {
 	var results []cacheRefMetadata

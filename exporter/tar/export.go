@@ -86,7 +86,7 @@ func (e *localExporterInstance) Export(ctx context.Context, inp *exporter.Source
 		}
 
 		st := fstypes.Stat{
-			Mode: uint32(os.ModeDir | 0755),
+			Mode: uint32(os.ModeDir | 0o755),
 			Path: strings.Replace(k, "/", "_", -1),
 		}
 		if e.opts.Epoch != nil {
@@ -143,7 +143,7 @@ func (e *localExporterInstance) Export(ctx context.Context, inp *exporter.Source
 		fs = d.FS
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "local Export"))
 	defer cancel()
 
 	caller, err := e.opt.SessionManager.Get(timeoutCtx, sessionID, false)

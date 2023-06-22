@@ -197,7 +197,7 @@ func (e *imageExporterInstance) Export(ctx context.Context, src *exporter.Source
 		return nil, nil, errors.Errorf("invalid variant %q", e.opt.Variant)
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "oci image Export"))
 	defer cancel()
 
 	caller, err := e.opt.SessionManager.Get(timeoutCtx, sessionID, false)
@@ -282,7 +282,7 @@ func normalizedNames(name string) ([]string, error) {
 		return nil, nil
 	}
 	names := strings.Split(name, ",")
-	var tagNames = make([]string, len(names))
+	tagNames := make([]string, len(names))
 	for i, name := range names {
 		parsed, err := reference.ParseNormalizedNamed(name)
 		if err != nil {

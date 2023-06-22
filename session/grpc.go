@@ -101,7 +101,7 @@ func monitorHealth(ctx context.Context, cc *grpc.ClientConn, cancelConn func()) 
 			healthcheckStart := time.Now()
 
 			timeout := time.Duration(math.Max(float64(defaultHealthcheckDuration), float64(lastHealthcheckDuration)*1.5))
-			ctx, cancel := context.WithTimeout(ctx, timeout)
+			ctx, cancel := context.WithTimeoutCause(ctx, timeout, errors.Wrap(context.DeadlineExceeded, "session grpc health"))
 			_, err := healthClient.Check(ctx, &grpc_health_v1.HealthCheckRequest{})
 			cancel()
 

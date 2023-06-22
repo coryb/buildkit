@@ -43,7 +43,7 @@ type GrpcClient interface {
 }
 
 func New(ctx context.Context, opts map[string]string, session, product string, c pb.LLBBridgeClient, w []client.WorkerInfo) (GrpcClient, error) {
-	pingCtx, pingCancel := context.WithTimeout(ctx, 15*time.Second)
+	pingCtx, pingCancel := context.WithTimeoutCause(ctx, 15*time.Second, errors.Wrap(context.DeadlineExceeded, "client ping"))
 	defer pingCancel()
 	resp, err := c.Ping(pingCtx, &pb.PingRequest{})
 	if err != nil {
@@ -1157,21 +1157,24 @@ type conn struct {
 func (s *conn) LocalAddr() net.Addr {
 	return dummyAddr{}
 }
+
 func (s *conn) RemoteAddr() net.Addr {
 	return dummyAddr{}
 }
+
 func (s *conn) SetDeadline(t time.Time) error {
 	return nil
 }
+
 func (s *conn) SetReadDeadline(t time.Time) error {
 	return nil
 }
+
 func (s *conn) SetWriteDeadline(t time.Time) error {
 	return nil
 }
 
-type dummyAddr struct {
-}
+type dummyAddr struct{}
 
 func (d dummyAddr) Network() string {
 	return "pipe"

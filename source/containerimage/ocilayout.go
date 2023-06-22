@@ -123,7 +123,7 @@ func (r *ociLayoutResolver) info(ctx context.Context, ref reference.Spec) (conte
 
 func (r *ociLayoutResolver) withCaller(ctx context.Context, f func(context.Context, session.Caller) error) error {
 	if r.store.SessionID != "" {
-		timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "ocilayout withCaller"))
 		defer cancel()
 
 		caller, err := r.sm.Get(timeoutCtx, r.store.SessionID, false)
@@ -148,6 +148,7 @@ func (r *readerAtWrapper) Read(p []byte) (n int, err error) {
 	r.offset += int64(n)
 	return
 }
+
 func (r *readerAtWrapper) Close() error {
 	return r.readerAt.Close()
 }

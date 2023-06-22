@@ -485,7 +485,7 @@ func (k procKiller) Kill(ctx context.Context) (err error) {
 
 	// this timeout is generally a no-op, the Kill ctx should already have a
 	// shorter timeout but here as a fail-safe for future refactoring.
-	ctx, timeout := context.WithTimeout(ctx, 10*time.Second)
+	ctx, timeout := context.WithTimeoutCause(ctx, 10*time.Second, errors.Wrap(context.DeadlineExceeded, "Kill"))
 	defer timeout()
 
 	if k.pidfile == "" {
@@ -568,7 +568,7 @@ func runcProcessHandle(ctx context.Context, killer procKiller) (*procHandle, con
 		for {
 			select {
 			case <-ctx.Done():
-				killCtx, timeout := context.WithTimeout(context.Background(), 7*time.Second)
+				killCtx, timeout := context.WithTimeoutCause(context.Background(), 7*time.Second, errors.Wrap(context.DeadlineExceeded, "runcProcessHandle"))
 				if err := p.killer.Kill(killCtx); err != nil {
 					select {
 					case <-killCtx.Done():
@@ -626,7 +626,7 @@ func (p *procHandle) WaitForReady(ctx context.Context) error {
 // We wait for up to 10s for the runc pid to be reported.  If the started
 // callback is non-nil it will be called after receiving the pid.
 func (p *procHandle) WaitForStart(ctx context.Context, startedCh <-chan int, started func()) error {
-	startedCtx, timeout := context.WithTimeout(ctx, 10*time.Second)
+	startedCtx, timeout := context.WithTimeoutCause(ctx, 10*time.Second, errors.Wrap(context.DeadlineExceeded, "WaitForStart"))
 	defer timeout()
 	select {
 	case <-startedCtx.Done():
