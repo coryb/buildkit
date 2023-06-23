@@ -7,10 +7,13 @@ import (
 	"sync"
 
 	"github.com/moby/buildkit/util/bklog"
+	"github.com/pkg/errors"
 )
 
-var appContextCache context.Context
-var appContextOnce sync.Once
+var (
+	appContextCache context.Context
+	appContextOnce  sync.Once
+)
 
 // Context returns a static context that reacts to termination signals of the
 // running process. Useful in CLI tools.
@@ -27,13 +30,13 @@ func Context() context.Context {
 			ctx = f(ctx)
 		}
 
-		ctx, cancel := context.WithCancel(ctx)
+		ctx, cancel := context.WithCancelCause(ctx)
 		appContextCache = ctx
 
 		go func() {
 			for {
 				<-signals
-				cancel()
+				cancel(errors.WithStack(context.Canceled))
 				retries++
 				if retries >= exitLimit {
 					bklog.G(ctx).Errorf("got %d SIGTERM/SIGINTs, forcing shutdown", retries)

@@ -116,8 +116,8 @@ func newCall(fn func(ctx context.Context) (interface{}, error)) *call {
 
 func (c *call) run() {
 	defer c.closeProgressWriter()
-	ctx, cancel := context.WithCancel(c.ctx)
-	defer cancel()
+	ctx, cancel := context.WithCancelCause(c.ctx)
+	defer cancel(errors.WithStack(context.Canceled))
 	v, err := c.fn(ctx)
 	c.mu.Lock()
 	c.result = v
@@ -154,8 +154,8 @@ func (c *call) wait(ctx context.Context) (v interface{}, err error) {
 		c.progressState.add(pw)
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	ctx, cancel := context.WithCancelCause(ctx)
+	defer cancel(errors.WithStack(context.Canceled))
 
 	c.ctxs = append(c.ctxs, ctx)
 

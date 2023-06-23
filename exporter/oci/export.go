@@ -197,7 +197,7 @@ func (e *imageExporterInstance) Export(ctx context.Context, src *exporter.Source
 		return nil, nil, errors.Errorf("invalid variant %q", e.opt.Variant)
 	}
 
-	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "oci image Export"))
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer cancel()
 
 	caller, err := e.opt.SessionManager.Get(timeoutCtx, sessionID, false)

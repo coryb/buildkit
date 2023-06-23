@@ -35,16 +35,26 @@ linters:
 
 linters-settings:
   depguard:
-    list-type: blacklist
-    include-go-root: true
-    packages:
-      # The io/ioutil package has been deprecated.
-      # https://go.dev/doc/go1.16#ioutil
-      - io/ioutil
+    rules:
+      main:
+        deny:
+          - pkg: "io/ioutil"
+            desc: io/ioutil has been deprecated, see https://go.dev/doc/go1.16#ioutil
   forbidigo:
     forbid:
-      - '^fmt\.Errorf(# use errors\.Errorf instead)?$'
-      - 'logrus\.(Trace|Debug|Info|Warn|Warning|Error|Fatal)(f|ln)?\((# use bklog\.G\(ctx\) instead of logrus directly)?'
+      - p: ^fmt\.Errorf$
+        msg: use errors.Errorf instead
+      - p: ^logrus\.(Trace|Debug|Info|Warn|Warning|Error|Fatal)(f|ln)?$
+        msg: use bklog.G(ctx) instead of logrus directly'
+      - p: ^context\.WithCancel$
+        msg: use context.WithCancelCause with cancel(errors.WithStack(context.Canceled)) instead'
+      - p: ^context\.WithTimeout$
+        msg: use context.WithTimeoutCause(..., errors.WithStack(context.DeadlineExceeded)) instead'
+      - p: ^context\.WithDeadline$
+        msg: use context.WithDeadlineCause(..., errors.WithStack(context.DeadlineExceeded)) instead'
+      - p: ^context\.Context\.Err$
+        msg: use context.Cause(ctx) instead'
+    analyze-types: true
   importas:
     alias:
       - pkg: "github.com/opencontainers/image-spec/specs-go/v1"

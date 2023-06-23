@@ -71,8 +71,10 @@ func grpcClientConn(ctx context.Context, conn net.Conn) (context.Context, *grpc.
 		return nil, nil, errors.Wrap(err, "failed to create grpc client")
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
-	go monitorHealth(ctx, cc, cancel)
+	ctx, cancel := context.WithCancelCause(ctx)
+	go monitorHealth(ctx, cc, func() {
+		cancel(errors.WithStack(context.Canceled))
+	})
 
 	return ctx, cc, nil
 }
@@ -101,7 +103,7 @@ func monitorHealth(ctx context.Context, cc *grpc.ClientConn, cancelConn func()) 
 			healthcheckStart := time.Now()
 
 			timeout := time.Duration(math.Max(float64(defaultHealthcheckDuration), float64(lastHealthcheckDuration)*1.5))
-			ctx, cancel := context.WithTimeoutCause(ctx, timeout, errors.Wrap(context.DeadlineExceeded, "session grpc health"))
+			ctx, cancel := context.WithTimeoutCause(ctx, timeout, errors.WithStack(context.DeadlineExceeded))
 			_, err := healthClient.Check(ctx, &grpc_health_v1.HealthCheckRequest{})
 			cancel()
 

@@ -74,7 +74,7 @@ func calc(ctx context.Context, total int, name string) (int, error) {
 	for i := 1; i <= total; i++ {
 		select {
 		case <-ctx.Done():
-			return 0, ctx.Err()
+			return 0, context.Cause(ctx)
 		case <-time.After(10 * time.Millisecond):
 		}
 		if i == total {

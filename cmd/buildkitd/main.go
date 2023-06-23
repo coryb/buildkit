@@ -210,8 +210,8 @@ func main() {
 		if os.Geteuid() > 0 {
 			return errors.New("rootless mode requires to be executed as the mapped root in a user namespace; you may use RootlessKit for setting up the namespace")
 		}
-		ctx, cancel := context.WithCancel(appcontext.Context())
-		defer cancel()
+		ctx, cancel := context.WithCancelCause(appcontext.Context())
+		defer cancel(errors.WithStack(context.Canceled))
 
 		cfg, err := config.LoadFile(c.GlobalString("config"))
 		if err != nil {
@@ -264,7 +264,7 @@ func main() {
 		// Stop if we are registering or unregistering against Windows SCM.
 		stop, err := registerUnregisterService(cfg.Root)
 		if err != nil {
-			logrus.Fatal(err)
+			bklog.G(ctx).Fatal(err)
 		}
 		if stop {
 			return nil
@@ -310,7 +310,7 @@ func main() {
 
 		// Launch as a Windows Service if necessary
 		if err := launchService(server); err != nil {
-			logrus.Fatal(err)
+			bklog.G(ctx).Fatal(err)
 		}
 
 		errCh := make(chan error, 1)
@@ -321,7 +321,7 @@ func main() {
 		select {
 		case serverErr := <-errCh:
 			err = serverErr
-			cancel()
+			cancel(errors.WithStack(context.Canceled))
 		case <-ctx.Done():
 			err = context.Cause(ctx)
 		}
@@ -585,14 +585,14 @@ func unaryInterceptor(globalCtx context.Context, tp trace.TracerProvider) grpc.U
 	withTrace := otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(tp), otelgrpc.WithPropagators(propagators))
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
+		ctx, cancel := context.WithCancelCause(ctx)
+		defer cancel(errors.WithStack(context.Canceled))
 
 		go func() {
 			select {
 			case <-ctx.Done():
 			case <-globalCtx.Done():
-				cancel()
+				cancel(errors.WithStack(context.Canceled))
 			}
 		}()
 

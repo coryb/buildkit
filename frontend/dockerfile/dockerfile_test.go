@@ -182,8 +182,10 @@ var reproTests = integration.TestFuncs(
 	testReproSourceDateEpoch,
 )
 
-var opts []integration.TestOpt
-var securityOpts []integration.TestOpt
+var (
+	opts         []integration.TestOpt
+	securityOpts []integration.TestOpt
+)
 
 type frontend interface {
 	Solve(context.Context, *client.Client, client.SolveOpt, chan *client.SolveStatus) (*client.SolveResponse, error)
@@ -260,8 +262,8 @@ echo -n $my_arg $1 > /out
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("myscript.sh", script, 0700),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("myscript.sh", script, 0o700),
 	)
 	require.NoError(t, err)
 
@@ -314,7 +316,7 @@ RUN [ "$myenv" = 'foo%sbar' ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -363,12 +365,12 @@ foo
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("Dockerfile.dockerignore", ignore, 0600),
-		fstest.CreateFile("Dockerfile2", dockerfile2, 0600),
-		fstest.CreateFile("Dockerfile2.dockerignore", ignore2, 0600),
-		fstest.CreateFile("foo", []byte("contents0"), 0600),
-		fstest.CreateFile("bar", []byte("contents0"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("Dockerfile.dockerignore", ignore, 0o600),
+		fstest.CreateFile("Dockerfile2", dockerfile2, 0o600),
+		fstest.CreateFile("Dockerfile2.dockerignore", ignore2, 0o600),
+		fstest.CreateFile("foo", []byte("contents0"), 0o600),
+		fstest.CreateFile("bar", []byte("contents0"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -408,8 +410,8 @@ RUN [ "$(cat testfile)" == "contents0" ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("testfile", []byte("contents0"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("testfile", []byte("contents0"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -448,8 +450,8 @@ COPY --from=base2 /foo /f
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("hello.txt", []byte("hello"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("hello.txt", []byte("hello"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -519,9 +521,9 @@ FROM stage-$TARGETOS
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("data"), 0600),
-		fstest.CreateFile("bar", []byte("data2"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("data"), 0o600),
+		fstest.CreateFile("bar", []byte("data2"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -593,7 +595,7 @@ WORKDIR /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -631,7 +633,7 @@ FROM busybox
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -668,7 +670,7 @@ ENV foo bar
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile.web", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile.web", dockerfile, 0o600),
 		fstest.Symlink("Dockerfile.web", "Dockerfile"),
 	)
 	require.NoError(t, err)
@@ -751,7 +753,7 @@ RUN e="300:400"; p="/file"                         ; a=` + "`" + `stat -c "%u:%g
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile.web", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile.web", dockerfile, 0o600),
 		fstest.Symlink("Dockerfile.web", "Dockerfile"),
 	)
 	require.NoError(t, err)
@@ -794,10 +796,10 @@ COPY --from=base unique /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo1", []byte("foo1-data"), 0600),
-		fstest.CreateFile("foo2", []byte("foo2-data"), 0600),
-		fstest.CreateFile("bar", []byte("bar-data"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo1", []byte("foo1-data"), 0o600),
+		fstest.CreateFile("foo2", []byte("foo2-data"), 0o600),
+		fstest.CreateFile("bar", []byte("bar-data"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -824,7 +826,7 @@ COPY --from=base unique /
 	dt, err := os.ReadFile(filepath.Join(destDir, "unique"))
 	require.NoError(t, err)
 
-	err = os.WriteFile(filepath.Join(dir, "bar"), []byte("bar-data-mod"), 0600)
+	err = os.WriteFile(filepath.Join(dir, "bar"), []byte("bar-data-mod"), 0o600)
 	require.NoError(t, err)
 
 	destDir = t.TempDir()
@@ -847,7 +849,7 @@ COPY --from=base unique /
 	require.NoError(t, err)
 	require.Equal(t, string(dt), string(dt2))
 
-	err = os.WriteFile(filepath.Join(dir, "foo2"), []byte("foo2-data-mod"), 0600)
+	err = os.WriteFile(filepath.Join(dir, "foo2"), []byte("foo2-data-mod"), 0o600)
 	require.NoError(t, err)
 
 	destDir = t.TempDir()
@@ -881,8 +883,8 @@ COPY foo nomatch* /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("contents0"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("contents0"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -924,7 +926,7 @@ RUN [ "$(stat -c "%U %G" /mydir)" == "user user" ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -955,7 +957,7 @@ COPY --from=base Dockerfile .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -985,7 +987,7 @@ RUN [ "$(stat -c "%U %G" /mydir)" == "user user" ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1019,7 +1021,7 @@ RUN [ "$(stat -c "%U %G" /dest01)" == "user01 user" ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1049,10 +1051,10 @@ COPY link/foo .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 		fstest.Symlink("sub", "link"),
-		fstest.CreateDir("sub", 0700),
-		fstest.CreateFile("sub/foo", []byte(`contents`), 0600),
+		fstest.CreateDir("sub", 0o700),
+		fstest.CreateFile("sub/foo", []byte(`contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1094,7 +1096,7 @@ COPY --from=build /sub2/foo bar
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1133,8 +1135,8 @@ COPY . /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateSocket("socket.sock", 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateSocket("socket.sock", 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1175,7 +1177,7 @@ RUN ["ls"]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1208,7 +1210,7 @@ COPY --from=build /out .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1252,7 +1254,7 @@ COPY --from=build /out .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1293,7 +1295,7 @@ COPY Dockerfile .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1383,11 +1385,11 @@ COPY arch-$TARGETARCH whoami
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("arch-arm", []byte(`i am arm`), 0600),
-		fstest.CreateFile("arch-amd64", []byte(`i am amd64`), 0600),
-		fstest.CreateFile("arch-s390x", []byte(`i am s390x`), 0600),
-		fstest.CreateFile("arch-ppc64le", []byte(`i am ppc64le`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("arch-arm", []byte(`i am arm`), 0o600),
+		fstest.CreateFile("arch-amd64", []byte(`i am amd64`), 0o600),
+		fstest.CreateFile("arch-s390x", []byte(`i am s390x`), 0o600),
+		fstest.CreateFile("arch-ppc64le", []byte(`i am ppc64le`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1516,9 +1518,9 @@ COPY foo /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateDir("foo", 0700),
-		fstest.CreateFile("foo/bar", []byte(`contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateDir("foo", 0o700),
+		fstest.CreateFile("foo/bar", []byte(`contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1536,8 +1538,8 @@ COPY foo /
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`contents2`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`contents2`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1572,8 +1574,8 @@ COPY foo /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1618,9 +1620,9 @@ COPY foo/sub bar
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("bar", []byte(`bar-contents`), 0600),
-		fstest.CreateDir("foo", 0700),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("bar", []byte(`bar-contents`), 0o600),
+		fstest.CreateDir("foo", 0o700),
 		fstest.Symlink("../bar", "foo/sub"),
 	)
 	require.NoError(t, err)
@@ -1649,16 +1651,16 @@ COPY sub/l* alllinks/
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("bar", []byte(`bar-contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("bar", []byte(`bar-contents`), 0o600),
 		fstest.Symlink("bar", "foo"),
-		fstest.CreateDir("sub", 0700),
-		fstest.CreateFile("sub/lfile", []byte(`lfile-contents`), 0600),
+		fstest.CreateDir("sub", 0o700),
+		fstest.CreateFile("sub/lfile", []byte(`lfile-contents`), 0o600),
 		fstest.Symlink("subfile", "sub/l0"),
-		fstest.CreateFile("sub/subfile", []byte(`subfile-contents`), 0600),
+		fstest.CreateFile("sub/subfile", []byte(`subfile-contents`), 0o600),
 		fstest.Symlink("second", "sub/l1"),
 		fstest.Symlink("baz", "sub/second"),
-		fstest.CreateFile("sub/baz", []byte(`baz-contents`), 0600),
+		fstest.CreateFile("sub/baz", []byte(`baz-contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1711,7 +1713,7 @@ COPY --from=0 /foo /foo
 
 	srcDir := t.TempDir()
 
-	err := os.WriteFile(filepath.Join(srcDir, "Dockerfile"), dockerfile, 0600)
+	err := os.WriteFile(filepath.Join(srcDir, "Dockerfile"), dockerfile, 0o600)
 	require.NoError(t, err)
 
 	resp := httpserver.Response{
@@ -1764,7 +1766,7 @@ CMD ["test"]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1797,7 +1799,7 @@ ENTRYPOINT my entrypoint
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1856,7 +1858,7 @@ LABEL foo=bar
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1889,8 +1891,8 @@ COPY foo .
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("foo-contents"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("foo-contents"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -1977,7 +1979,7 @@ FROM busybox:${tag}
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2013,8 +2015,8 @@ func testDockerfileDirs(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("bar"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("bar"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2041,13 +2043,13 @@ func testDockerfileDirs(t *testing.T, sb integration.Sandbox) {
 	// different context and dockerfile directories
 	dir1, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
 	dir2, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("foo", []byte("bar"), 0600),
+		fstest.CreateFile("foo", []byte("bar"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2075,7 +2077,7 @@ func testDockerfileInvalidCommand(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2101,7 +2103,7 @@ func testDockerfileInvalidInstruction(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2151,7 +2153,7 @@ ADD %s /dest/
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2176,7 +2178,7 @@ ADD %s /dest/
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2210,7 +2212,7 @@ func testDockerfileAddArchive(t *testing.T, sb integration.Sandbox) {
 		Name:     "foo",
 		Typeflag: tar.TypeReg,
 		Size:     int64(len(expectedContent)),
-		Mode:     0644,
+		Mode:     0o644,
 	})
 	require.NoError(t, err)
 	_, err = tw.Write(expectedContent)
@@ -2225,8 +2227,8 @@ ADD t.tar /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("t.tar", buf.Bytes(), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("t.tar", buf.Bytes(), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2257,8 +2259,8 @@ ADD t.tar.gz /
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("t.tar.gz", buf2.Bytes(), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("t.tar.gz", buf2.Bytes(), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2282,8 +2284,8 @@ COPY t.tar.gz /
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("t.tar.gz", buf2.Bytes(), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("t.tar.gz", buf2.Bytes(), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2317,7 +2319,7 @@ ADD %s /
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2341,7 +2343,7 @@ ADD %s /newname.tar.gz
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2368,7 +2370,7 @@ func testDockerfileAddArchiveWildcard(t *testing.T, sb integration.Sandbox) {
 		Name:     "foo",
 		Typeflag: tar.TypeReg,
 		Size:     int64(len(expectedContent)),
-		Mode:     0644,
+		Mode:     0o644,
 	})
 	require.NoError(t, err)
 	_, err = tw.Write(expectedContent)
@@ -2383,7 +2385,7 @@ func testDockerfileAddArchiveWildcard(t *testing.T, sb integration.Sandbox) {
 		Name:     "bar",
 		Typeflag: tar.TypeReg,
 		Size:     int64(len(expectedContent)),
-		Mode:     0644,
+		Mode:     0o644,
 	})
 	require.NoError(t, err)
 	_, err = tw.Write(expectedContent)
@@ -2398,9 +2400,9 @@ ADD *.tar /dest
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("t.tar", buf.Bytes(), 0600),
-		fstest.CreateFile("b.tar", buf2.Bytes(), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("t.tar", buf.Bytes(), 0o600),
+		fstest.CreateFile("b.tar", buf2.Bytes(), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2446,8 +2448,8 @@ RUN [ "$(stat -c "%u %G" /foo)" == "1000 nobody" ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`foo-contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`foo-contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2478,7 +2480,7 @@ func testSymlinkDestination(t *testing.T, sb integration.Sandbox) {
 		Name:     "symlink",
 		Typeflag: tar.TypeSymlink,
 		Linkname: "../tmp/symlink-target",
-		Mode:     0755,
+		Mode:     0o755,
 	})
 	require.NoError(t, err)
 	err = tw.Close()
@@ -2492,9 +2494,9 @@ COPY foo /symlink/
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", expectedContent, 0600),
-		fstest.CreateFile("t.tar", buf.Bytes(), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", expectedContent, 0o600),
+		fstest.CreateFile("t.tar", buf.Bytes(), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2526,7 +2528,7 @@ ENV foo=bar
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2591,7 +2593,7 @@ EXPOSE 5000
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2671,12 +2673,12 @@ Dockerfile
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`foo-contents`), 0600),
-		fstest.CreateFile("bar", []byte(`bar-contents`), 0600),
-		fstest.CreateFile("baz", []byte(`baz-contents`), 0600),
-		fstest.CreateFile("bay", []byte(`bay-contents`), 0600),
-		fstest.CreateFile(".dockerignore", dockerignore, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`foo-contents`), 0o600),
+		fstest.CreateFile("bar", []byte(`bar-contents`), 0o600),
+		fstest.CreateFile("baz", []byte(`baz-contents`), 0o600),
+		fstest.CreateFile("bay", []byte(`bay-contents`), 0o600),
+		fstest.CreateFile(".dockerignore", dockerignore, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2735,12 +2737,12 @@ COPY . .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile(".dockerignore", []byte("!\n"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile(".dockerignore", []byte("!\n"), 0o600),
 	)
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithTimeout(sb.Context(), 15*time.Second)
+	ctx, cancel := context.WithTimeoutCause(sb.Context(), 15*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer cancel()
 
 	c, err := client.New(ctx, sb.Address())
@@ -2771,7 +2773,7 @@ func testDockerfileLowercase(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("dockerfile", dockerfile, 0600),
+		fstest.CreateFile("dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2809,8 +2811,8 @@ RUN ["ls"]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("contents0"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("contents0"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -2936,7 +2938,7 @@ USER nobody
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3033,7 +3035,7 @@ RUN [ "$(id)" = "uid=1(daemon) gid=1(daemon) groups=1(daemon)" ]
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3070,10 +3072,10 @@ COPY --from=base /out /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`foo-contents`), 0600),
-		fstest.CreateDir("bar", 0700),
-		fstest.CreateFile("bar/sub", nil, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`foo-contents`), 0o600),
+		fstest.CreateDir("bar", 0o700),
+		fstest.CreateFile("bar/sub", nil, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3133,9 +3135,9 @@ COPY --from=base /out /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`foo-contents`), 0600),
-		fstest.CreateFile("bar", []byte(`bar-contents`), 0700),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`foo-contents`), 0o600),
+		fstest.CreateFile("bar", []byte(`bar-contents`), 0o700),
 	)
 	require.NoError(t, err)
 
@@ -3187,13 +3189,13 @@ COPY files dest
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateDir("sub", 0700),
-		fstest.CreateDir("sub/dir1", 0700),
-		fstest.CreateDir("sub/dir1/dir2", 0700),
-		fstest.CreateFile("sub/dir1/dir2/foo", []byte(`foo-contents`), 0600),
-		fstest.CreateDir("files", 0700),
-		fstest.CreateFile("files/foo.go", []byte(`foo.go-contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateDir("sub", 0o700),
+		fstest.CreateDir("sub/dir1", 0o700),
+		fstest.CreateDir("sub/dir1/dir2", 0o700),
+		fstest.CreateFile("sub/dir1/dir2/foo", []byte(`foo-contents`), 0o600),
+		fstest.CreateDir("files", 0o700),
+		fstest.CreateFile("files/foo.go", []byte(`foo.go-contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3237,8 +3239,8 @@ COPY $FOO baz
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("bar", []byte(`bar-contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("bar", []byte(`bar-contents`), 0o600),
 	)
 
 	require.NoError(t, err)
@@ -3286,13 +3288,13 @@ COPY sub/dir1 subdest6
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo.go", []byte(`foo-contents`), 0600),
-		fstest.CreateFile("bar.go", []byte(`bar-contents`), 0600),
-		fstest.CreateDir("sub", 0700),
-		fstest.CreateDir("sub/dir1", 0700),
-		fstest.CreateDir("sub/dir1/dir2", 0700),
-		fstest.CreateFile("sub/dir1/dir2/foo", []byte(`foo-contents`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo.go", []byte(`foo-contents`), 0o600),
+		fstest.CreateFile("bar.go", []byte(`bar-contents`), 0o600),
+		fstest.CreateDir("sub", 0o700),
+		fstest.CreateDir("sub/dir1", 0o700),
+		fstest.CreateDir("sub/dir1/dir2", 0o700),
+		fstest.CreateFile("sub/dir1/dir2/foo", []byte(`foo-contents`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3386,8 +3388,8 @@ RUN sh -c "[ $(cat /test5/foo) = 'hello' ]"
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte(`hello`), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte(`hello`), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3432,7 +3434,7 @@ COPY --from=build /dest /dest
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3473,7 +3475,7 @@ FROM scratch
 COPY --from=build foo bar
 `
 
-	err := os.WriteFile(filepath.Join(gitDir, "Dockerfile"), []byte(dockerfile), 0600)
+	err := os.WriteFile(filepath.Join(gitDir, "Dockerfile"), []byte(dockerfile), 0o600)
 	require.NoError(t, err)
 
 	err = runShell(gitDir,
@@ -3490,7 +3492,7 @@ COPY --from=build foo bar
 COPY --from=build foo bar2
 `
 
-	err = os.WriteFile(filepath.Join(gitDir, "Dockerfile"), []byte(dockerfile), 0600)
+	err = os.WriteFile(filepath.Join(gitDir, "Dockerfile"), []byte(dockerfile), 0o600)
 	require.NoError(t, err)
 
 	err = runShell(gitDir,
@@ -3564,7 +3566,7 @@ func testDockerfileFromHTTP(t *testing.T, sb integration.Sandbox) {
 	writeFile := func(fn, dt string) {
 		err := w.WriteHeader(&tar.Header{
 			Name:     fn,
-			Mode:     0600,
+			Mode:     0o600,
 			Size:     int64(len(dt)),
 			Typeflag: tar.TypeReg,
 		})
@@ -3626,7 +3628,7 @@ COPY --from=busybox /etc/passwd test
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3666,7 +3668,7 @@ COPY --from=golang /usr/bin/go go
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3704,8 +3706,8 @@ COPY --from=stage1 baz bax
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("foo-contents"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("foo-contents"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3747,7 +3749,7 @@ LABEL foo=bar
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3819,8 +3821,8 @@ RUN ls /files/file1
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("file1", []byte("foo"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("file1", []byte("foo"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3866,7 +3868,7 @@ ONBUILD RUN mkdir -p /out && echo -n 11 >> /out/foo
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3899,7 +3901,7 @@ ONBUILD RUN mkdir -p /out && echo -n 11 >> /out/foo
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3930,7 +3932,7 @@ ONBUILD RUN mkdir -p /out && echo -n 11 >> /out/foo
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -3981,7 +3983,7 @@ COPY --from=base arch /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4105,8 +4107,8 @@ COPY --from=base unique /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("foobar"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("foobar"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4186,6 +4188,7 @@ COPY --from=base unique /
 	require.NoError(t, err)
 	require.Equal(t, string(dt), string(dt2))
 }
+
 func testCacheImportExport(t *testing.T, sb integration.Sandbox) {
 	integration.CheckFeatureCompat(t, sb, integration.FeatureCacheExport, integration.FeatureCacheBackendLocal)
 	f := getFrontend(t, sb)
@@ -4208,8 +4211,8 @@ COPY --from=base unique /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("foobar"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("foobar"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4290,8 +4293,8 @@ RUN echo bar > bar
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("foo-contents"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("foo-contents"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4367,8 +4370,8 @@ RUN echo bar > bar
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("foobar"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("foobar"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4445,7 +4448,7 @@ COPY --from=s1 unique2 /
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4525,9 +4528,9 @@ COPY foo2 bar2
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("d0"), 0600),
-		fstest.CreateFile("foo2", []byte("d1"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("d0"), 0o600),
+		fstest.CreateFile("foo2", []byte("d1"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4576,7 +4579,7 @@ COPY --from=build out .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4630,7 +4633,7 @@ COPY --from=build /out /
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4736,7 +4739,7 @@ COPY foo /
 		Name:     "Dockerfile",
 		Typeflag: tar.TypeReg,
 		Size:     int64(len(dockerfile)),
-		Mode:     0644,
+		Mode:     0o644,
 	})
 	require.NoError(t, err)
 	_, err = tw.Write(dockerfile)
@@ -4745,7 +4748,7 @@ COPY foo /
 		Name:     "foo",
 		Typeflag: tar.TypeReg,
 		Size:     int64(len(foo)),
-		Mode:     0644,
+		Mode:     0o644,
 	})
 	require.NoError(t, err)
 	_, err = tw.Write(foo)
@@ -4780,7 +4783,7 @@ func testTarContextExternalDockerfile(t *testing.T, sb integration.Sandbox) {
 		Name:     "sub/dir/foo",
 		Typeflag: tar.TypeReg,
 		Size:     int64(len(foo)),
-		Mode:     0644,
+		Mode:     0o644,
 	})
 	require.NoError(t, err)
 	_, err = tw.Write(foo)
@@ -4794,7 +4797,7 @@ COPY foo bar
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4843,8 +4846,8 @@ COPY foo foo2
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
-		fstest.CreateFile("foo", []byte("data"), 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
+		fstest.CreateFile("foo", []byte("data"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4937,7 +4940,7 @@ COPY foo foo2
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -4979,7 +4982,7 @@ COPY Dockerfile Dockerfile
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5053,7 +5056,7 @@ RUN echo $(hostname) | grep foo
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5111,7 +5114,7 @@ COPY --from=base /shmsize /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5154,7 +5157,7 @@ COPY --from=base /ulimit /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5201,7 +5204,7 @@ COPY --from=base /out /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5249,7 +5252,7 @@ COPY --from=base /out /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5290,7 +5293,7 @@ ENV FOOBAR=foobar
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5331,7 +5334,7 @@ COPY --from=base /env_foobar /
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5389,7 +5392,7 @@ func testNamedImageContextPlatform(t *testing.T, sb integration.Sandbox) {
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5422,7 +5425,7 @@ RUN echo hello
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5465,7 +5468,7 @@ RUN echo foo >> /test
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5494,7 +5497,7 @@ RUN echo foo >> /test
 
 	dirDerived, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5546,7 +5549,7 @@ EOF
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5597,7 +5600,7 @@ COPY --from=base /o* /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5605,9 +5608,9 @@ COPY --from=base /o* /
 
 	dir2, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("out", outf, 0600),
-		fstest.CreateFile("out2", outf, 0600),
-		fstest.CreateFile(".dockerignore", []byte("out2\n"), 0600),
+		fstest.CreateFile("out", outf, 0o600),
+		fstest.CreateFile("out2", outf, 0o600),
+		fstest.CreateFile(".dockerignore", []byte("out2\n"), 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5667,7 +5670,7 @@ func testNamedOCILayoutContext(t *testing.T, sb integration.Sandbox) {
 	`)
 	inDir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", ociDockerfile, 0600),
+		fstest.CreateFile("Dockerfile", ociDockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5695,13 +5698,13 @@ func testNamedOCILayoutContext(t *testing.T, sb integration.Sandbox) {
 
 	for filename, content := range m {
 		fullFilename := path.Join(ocidir, filename)
-		err = os.MkdirAll(path.Dir(fullFilename), 0755)
+		err = os.MkdirAll(path.Dir(fullFilename), 0o755)
 		require.NoError(t, err)
 		if content.Header.FileInfo().IsDir() {
-			err = os.MkdirAll(fullFilename, 0755)
+			err = os.MkdirAll(fullFilename, 0o755)
 			require.NoError(t, err)
 		} else {
-			err = os.WriteFile(fullFilename, content.Data, 0644)
+			err = os.WriteFile(fullFilename, content.Data, 0o644)
 			require.NoError(t, err)
 		}
 	}
@@ -5737,7 +5740,7 @@ COPY --from=imported /test/outfoo /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5797,7 +5800,7 @@ ENV foo=bar
 	`)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5821,13 +5824,13 @@ ENV foo=bar
 
 	for filename, content := range m {
 		fullFilename := path.Join(ocidir, filename)
-		err = os.MkdirAll(path.Dir(fullFilename), 0755)
+		err = os.MkdirAll(path.Dir(fullFilename), 0o755)
 		require.NoError(t, err)
 		if content.Header.FileInfo().IsDir() {
-			err = os.MkdirAll(fullFilename, 0755)
+			err = os.MkdirAll(fullFilename, 0o755)
 			require.NoError(t, err)
 		} else {
-			err = os.WriteFile(fullFilename, content.Data, 0644)
+			err = os.WriteFile(fullFilename, content.Data, 0o644)
 			require.NoError(t, err)
 		}
 	}
@@ -5848,7 +5851,7 @@ FROM nonexistent AS base
 
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5907,7 +5910,7 @@ RUN echo first > /out
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -5920,7 +5923,7 @@ COPY --from=build /foo /out /
 
 	dir2, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile2, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile2, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6018,7 +6021,7 @@ RUN echo "foo $TARGETARCH" > /out
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6031,7 +6034,7 @@ COPY --from=build /foo /out /
 
 	dir2, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile2, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile2, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6161,7 +6164,7 @@ COPY Dockerfile .
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -6257,7 +6260,7 @@ CMD sh /scan.sh
 `)
 	scannerDir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6287,7 +6290,7 @@ EOF
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6375,7 +6378,7 @@ CMD sh /scan.sh
 
 	scannerDir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6407,7 +6410,7 @@ FROM base
 `)
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6472,7 +6475,7 @@ ARG BUILDKIT_SBOM_SCAN_STAGE=true
 `)
 	dir, err = integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 
@@ -6575,7 +6578,7 @@ COPY Dockerfile \
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -6673,7 +6676,7 @@ COPY --from=0 / /
 
 	dir, err := integration.Tmpdir(
 		t,
-		fstest.CreateFile("Dockerfile", dockerfile, 0600),
+		fstest.CreateFile("Dockerfile", dockerfile, 0o600),
 	)
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
@@ -6910,6 +6913,7 @@ func (f *clientFrontend) SolveGateway(ctx context.Context, c gateway.Client, req
 func (f *clientFrontend) DFCmdArgs(ctx, dockerfile string) (string, string) {
 	return "", ""
 }
+
 func (f *clientFrontend) RequiresBuildctl(t *testing.T) {
 	t.Skip()
 }
@@ -6970,8 +6974,10 @@ func (*secModeInsecure) UpdateConfigFile(in string) string {
 	return in + "\n\ninsecure-entitlements = [\"security.insecure\"]\n"
 }
 
-var securityInsecureGranted integration.ConfigUpdater = &secModeInsecure{}
-var securityInsecureDenied integration.ConfigUpdater = &secModeSandbox{}
+var (
+	securityInsecureGranted integration.ConfigUpdater = &secModeInsecure{}
+	securityInsecureDenied  integration.ConfigUpdater = &secModeSandbox{}
+)
 
 type networkModeHost struct{}
 
@@ -6985,8 +6991,10 @@ func (*networkModeSandbox) UpdateConfigFile(in string) string {
 	return in
 }
 
-var networkHostGranted integration.ConfigUpdater = &networkModeHost{}
-var networkHostDenied integration.ConfigUpdater = &networkModeSandbox{}
+var (
+	networkHostGranted integration.ConfigUpdater = &networkModeHost{}
+	networkHostDenied  integration.ConfigUpdater = &networkModeSandbox{}
+)
 
 func fixedWriteCloser(wc io.WriteCloser) func(map[string]string) (io.WriteCloser, error) {
 	return func(map[string]string) (io.WriteCloser, error) {

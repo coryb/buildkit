@@ -469,7 +469,7 @@ func (jl *Solver) NewJob(id string) (*Job, error) {
 }
 
 func (jl *Solver) Get(id string) (*Job, error) {
-	ctx, cancel := context.WithTimeoutCause(context.Background(), 6*time.Second, errors.Wrap(context.DeadlineExceeded, "job Get"))
+	ctx, cancel := context.WithTimeoutCause(context.Background(), 6*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer cancel()
 
 	go func() {

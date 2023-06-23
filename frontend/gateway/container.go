@@ -47,7 +47,7 @@ type Mount struct {
 }
 
 func NewContainer(ctx context.Context, w worker.Worker, sm *session.Manager, g session.Group, req NewContainerRequest) (client.Container, error) {
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancelCause(ctx)
 	eg, ctx := errgroup.WithContext(ctx)
 	platform := opspb.Platform{
 		OS:           runtime.GOOS,
@@ -67,7 +67,9 @@ func NewContainer(ctx context.Context, w worker.Worker, sm *session.Manager, g s
 		group:      g,
 		errGroup:   eg,
 		ctx:        ctx,
-		cancel:     cancel,
+		cancel: func() {
+			cancel(errors.WithStack(context.Canceled))
+		},
 	}
 
 	var (

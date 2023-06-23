@@ -199,7 +199,7 @@ type sshMountInstance struct {
 }
 
 func (sm *sshMountInstance) Mount() ([]mount.Mount, func() error, error) {
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithCancelCause(context.TODO())
 
 	uid := int(sm.sm.mount.SSHOpt.Uid)
 	gid := int(sm.sm.mount.SSHOpt.Gid)
@@ -210,7 +210,7 @@ func (sm *sshMountInstance) Mount() ([]mount.Mount, func() error, error) {
 			GID: gid,
 		})
 		if err != nil {
-			cancel()
+			cancel(errors.WithStack(context.Canceled))
 			return nil, nil, err
 		}
 		uid = identity.UID
@@ -224,7 +224,7 @@ func (sm *sshMountInstance) Mount() ([]mount.Mount, func() error, error) {
 		Mode: int(sm.sm.mount.SSHOpt.Mode & 0o777),
 	})
 	if err != nil {
-		cancel()
+		cancel(errors.WithStack(context.Canceled))
 		return nil, nil, err
 	}
 	release := func() error {
@@ -232,7 +232,7 @@ func (sm *sshMountInstance) Mount() ([]mount.Mount, func() error, error) {
 		if cleanup != nil {
 			err = cleanup()
 		}
-		cancel()
+		cancel(errors.WithStack(context.Canceled))
 		return err
 	}
 

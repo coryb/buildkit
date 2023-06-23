@@ -72,7 +72,7 @@ func (sm *Manager) Any(ctx context.Context, g Group, f func(context.Context, str
 			return errors.Errorf("no active sessions")
 		}
 
-		timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "session group Any"))
+		timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.WithStack(context.DeadlineExceeded))
 		defer cancel()
 		c, err := sm.Get(timeoutCtx, id, false)
 		if err != nil {

@@ -99,8 +99,8 @@ func (sm *Manager) HandleConn(ctx context.Context, conn net.Conn, opts map[strin
 
 // caller needs to take lock, this function will release it
 func (sm *Manager) handleConn(ctx context.Context, conn net.Conn, opts map[string][]string) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	ctx, cancel := context.WithCancelCause(ctx)
+	defer cancel(errors.WithStack(context.Canceled))
 
 	opts = canonicalHeaders(opts)
 
@@ -121,8 +121,10 @@ func (sm *Manager) handleConn(ctx context.Context, conn net.Conn, opts map[strin
 			name:      name,
 			sharedKey: sharedKey,
 			ctx:       ctx,
-			cancelCtx: cancel,
-			done:      make(chan struct{}),
+			cancelCtx: func() {
+				cancel(errors.WithStack(context.Canceled))
+			},
+			done: make(chan struct{}),
 		},
 		cc:        cc,
 		supported: make(map[string]struct{}),
@@ -156,8 +158,8 @@ func (sm *Manager) Get(ctx context.Context, id string, noWait bool) (Caller, err
 		id = p[1]
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	ctx, cancel := context.WithCancelCause(ctx)
+	defer cancel(errors.WithStack(context.Canceled))
 
 	go func() {
 		<-ctx.Done()

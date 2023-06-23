@@ -169,7 +169,7 @@ func testWarnings(t *testing.T, sb integration.Sandbox) {
 	product := "buildkit_test"
 
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
-		st := llb.Scratch().File(llb.Mkfile("/dummy", 0600, []byte("foo")))
+		st := llb.Scratch().File(llb.Mkfile("/dummy", 0o600, []byte("foo")))
 
 		def, err := st.Marshal(ctx)
 		if err != nil {
@@ -445,7 +445,6 @@ func testClientGatewayContainerExecPipe(t *testing.T, sb integration.Sandbox) {
 				Ref:       r.Ref,
 			}},
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -476,7 +475,6 @@ func testClientGatewayContainerExecPipe(t *testing.T, sb integration.Sandbox) {
 			Stdin:  io.NopCloser(stdin2),
 			Stdout: stdout2,
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -569,7 +567,6 @@ func testClientGatewayContainerPID1Fail(t *testing.T, sb integration.Sandbox) {
 				Ref:       r.Ref,
 			}},
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -633,7 +630,6 @@ func testClientGatewayContainerPID1Exit(t *testing.T, sb integration.Sandbox) {
 				Ref:       r.Ref,
 			}},
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -687,7 +683,7 @@ func testClientGatewayContainerMounts(t *testing.T, sb integration.Sandbox) {
 
 	tmpdir := t.TempDir()
 
-	err = os.WriteFile(filepath.Join(tmpdir, "local-file"), []byte("local"), 0644)
+	err = os.WriteFile(filepath.Join(tmpdir, "local-file"), []byte("local"), 0o644)
 	require.NoError(t, err)
 
 	a := agent.NewKeyring()
@@ -929,7 +925,7 @@ func testClientGatewayContainerPID1Tty(t *testing.T, sb integration.Sandbox) {
 	output := bytes.NewBuffer(nil)
 
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
-		ctx, timeout := context.WithTimeout(ctx, 10*time.Second)
+		ctx, timeout := context.WithTimeoutCause(ctx, 10*time.Second, errors.WithStack(context.DeadlineExceeded))
 		defer timeout()
 
 		st := llb.Image("busybox:latest")
@@ -1011,7 +1007,7 @@ func testClientGatewayContainerCancelPID1Tty(t *testing.T, sb integration.Sandbo
 	output := bytes.NewBuffer(nil)
 
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		ctx, cancel := context.WithTimeoutCause(ctx, 10*time.Second, errors.WithStack(context.DeadlineExceeded))
 		defer cancel()
 
 		st := llb.Image("busybox:latest")
@@ -1137,7 +1133,7 @@ func testClientGatewayContainerExecTty(t *testing.T, sb integration.Sandbox) {
 	inputR, inputW := io.Pipe()
 	output := bytes.NewBuffer(nil)
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
-		ctx, timeout := context.WithTimeout(ctx, 10*time.Second)
+		ctx, timeout := context.WithTimeoutCause(ctx, 10*time.Second, errors.WithStack(context.DeadlineExceeded))
 		defer timeout()
 		st := llb.Image("busybox:latest")
 
@@ -1229,7 +1225,7 @@ func testClientGatewayContainerCancelExecTty(t *testing.T, sb integration.Sandbo
 	inputR, inputW := io.Pipe()
 	output := bytes.NewBuffer(nil)
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
-		ctx, timeout := context.WithTimeout(ctx, 10*time.Second)
+		ctx, timeout := context.WithTimeoutCause(ctx, 10*time.Second, errors.WithStack(context.DeadlineExceeded))
 		defer timeout()
 		st := llb.Image("busybox:latest")
 
@@ -1262,8 +1258,8 @@ func testClientGatewayContainerCancelExecTty(t *testing.T, sb integration.Sandbo
 		defer pid1.Wait()
 		defer ctr.Release(ctx)
 
-		execCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
+		execCtx, cancel := context.WithCancelCause(ctx)
+		defer cancel(errors.WithStack(context.Canceled))
 
 		prompt := newTestPrompt(execCtx, t, inputW, output)
 		pid2, err := ctr.Start(execCtx, client.StartRequest{
@@ -1277,7 +1273,7 @@ func testClientGatewayContainerCancelExecTty(t *testing.T, sb integration.Sandbo
 		require.NoError(t, err)
 
 		prompt.SendExpect("echo hi", "hi")
-		cancel()
+		cancel(errors.WithStack(context.Canceled))
 
 		err = pid2.Wait()
 		require.ErrorIs(t, err, context.Canceled)
@@ -1307,8 +1303,8 @@ func testClientSlowCacheRootfsRef(t *testing.T, sb integration.Sandbox) {
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
 		id := identity.NewID()
 		input := llb.Scratch().File(
-			llb.Mkdir("/found", 0700).
-				Mkfile("/found/data", 0600, []byte(id)),
+			llb.Mkdir("/found", 0o700).
+				Mkfile("/found/data", 0o600, []byte(id)),
 		)
 
 		st := llb.Image("busybox:latest").Run(
@@ -1455,39 +1451,44 @@ func testClientGatewayExecError(t *testing.T, sb integration.Sandbox) {
 			llb.Image("busybox:latest").Run(
 				llb.Shlexf(`sh -c "echo %s > /data && fail"`, id),
 			).Root(),
-			1, []string{"/data"},
+			1,
+			[]string{"/data"},
 		}, {
 			"rootfs and readwrite scratch mount",
 			llb.Image("busybox:latest").Run(
 				llb.Shlexf(`sh -c "echo %s > /data && echo %s > /rw/data && fail"`, id, id),
 				llb.AddMount("/rw", llb.Scratch()),
 			).Root(),
-			2, []string{"/data", "/rw/data"},
+			2,
+			[]string{"/data", "/rw/data"},
 		}, {
 			"rootfs and readwrite mount",
 			llb.Image("busybox:latest").Run(
 				llb.Shlexf(`sh -c "echo %s > /data && echo %s > /rw/data && fail"`, id, id),
-				llb.AddMount("/rw", llb.Scratch().File(llb.Mkfile("foo", 0700, []byte(id)))),
+				llb.AddMount("/rw", llb.Scratch().File(llb.Mkfile("foo", 0o700, []byte(id)))),
 			).Root(),
-			2, []string{"/data", "/rw/data", "/rw/foo"},
+			2,
+			[]string{"/data", "/rw/data", "/rw/foo"},
 		}, {
 			"rootfs and readonly scratch mount",
 			llb.Image("busybox:latest").Run(
 				llb.Shlexf(`sh -c "echo %s > /data && echo %s > /readonly/foo"`, id, id),
 				llb.AddMount("/readonly", llb.Scratch(), llb.Readonly),
 			).Root(),
-			2, []string{"/data"},
+			2,
+			[]string{"/data"},
 		}, {
 			"rootfs and readwrite force no output mount",
 			llb.Image("busybox:latest").Run(
 				llb.Shlexf(`sh -c "echo %s > /data && echo %s > /rw/data && fail"`, id, id),
 				llb.AddMount(
 					"/rw",
-					llb.Scratch().File(llb.Mkfile("foo", 0700, []byte(id))),
+					llb.Scratch().File(llb.Mkfile("foo", 0o700, []byte(id))),
 					llb.ForceNoOutput,
 				),
 			).Root(),
-			2, []string{"/data", "/rw/data", "/rw/foo"},
+			2,
+			[]string{"/data", "/rw/data", "/rw/foo"},
 		}}
 
 		for _, tt := range tests {
@@ -1602,8 +1603,8 @@ func testClientGatewaySlowCacheExecError(t *testing.T, sb integration.Sandbox) {
 
 	id := identity.NewID()
 	input := llb.Scratch().File(
-		llb.Mkdir("/found", 0700).
-			Mkfile("/found/data", 0600, []byte(id)),
+		llb.Mkdir("/found", 0o700).
+			Mkfile("/found/data", 0o600, []byte(id)),
 	)
 
 	st := llb.Image("busybox:latest").Run(
@@ -1714,9 +1715,9 @@ func testClientGatewayExecFileActionError(t *testing.T, sb integration.Sandbox) 
 		}{{
 			"mkfile",
 			llb.Scratch().File(
-				llb.Mkdir("/found", 0700).
-					Mkfile("/found/foo", 0600, []byte(id)).
-					Mkfile("/notfound/foo", 0600, []byte(id)),
+				llb.Mkdir("/found", 0o700).
+					Mkfile("/found/foo", 0o600, []byte(id)).
+					Mkfile("/notfound/foo", 0o600, []byte(id)),
 			),
 			0, 3, "/input/found/foo",
 		}, {
@@ -1724,7 +1725,7 @@ func testClientGatewayExecFileActionError(t *testing.T, sb integration.Sandbox) 
 			llb.Image("busybox").File(
 				llb.Copy(
 					llb.Scratch().File(
-						llb.Mkdir("/foo", 0600).Mkfile("/foo/bar", 0700, []byte(id)),
+						llb.Mkdir("/foo", 0o600).Mkfile("/foo/bar", 0o700, []byte(id)),
 					),
 					"/foo/bar",
 					"/notfound/baz",
@@ -1735,7 +1736,7 @@ func testClientGatewayExecFileActionError(t *testing.T, sb integration.Sandbox) 
 			"copy from action",
 			llb.Image("busybox").File(
 				llb.Copy(
-					llb.Mkdir("/foo", 0600).Mkfile("/foo/bar", 0700, []byte(id)).WithState(llb.Scratch()),
+					llb.Mkdir("/foo", 0o600).Mkfile("/foo/bar", 0o700, []byte(id)).WithState(llb.Scratch()),
 					"/foo/bar",
 					"/notfound/baz",
 				),
@@ -1905,7 +1906,6 @@ func testClientGatewayContainerSecurityMode(t *testing.T, sb integration.Sandbox
 				Ref:       r.Ref,
 			}},
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -1985,7 +1985,6 @@ func testClientGatewayContainerExtraHosts(t *testing.T, sb integration.Sandbox) 
 				IP:   "169.254.11.22",
 			}},
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -2074,7 +2073,6 @@ func testClientGatewayContainerHostNetworking(t *testing.T, sb integration.Sandb
 			}},
 			NetMode: netMode,
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -2128,7 +2126,7 @@ func testClientGatewayContainerSignal(t *testing.T, sb integration.Sandbox) {
 	product := "buildkit_test"
 
 	b := func(ctx context.Context, c client.Client) (*client.Result, error) {
-		ctx, timeout := context.WithTimeout(ctx, 10*time.Second)
+		ctx, timeout := context.WithTimeoutCause(ctx, 10*time.Second, errors.WithStack(context.DeadlineExceeded))
 		defer timeout()
 
 		st := llb.Image("busybox:latest")

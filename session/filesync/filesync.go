@@ -65,6 +65,7 @@ func (sp *fsSyncProvider) Register(server *grpc.Server) {
 func (sp *fsSyncProvider) DiffCopy(stream FileSync_DiffCopyServer) error {
 	return sp.handle("diffcopy", stream)
 }
+
 func (sp *fsSyncProvider) TarStream(stream FileSync_TarStreamServer) error {
 	return sp.handle("tarstream", stream)
 }
@@ -202,8 +203,8 @@ func FSSync(ctx context.Context, c session.Caller, opt FSSendRequestOpt) error {
 
 	opts[keyDirName] = []string{opt.Name}
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	ctx, cancel := context.WithCancelCause(ctx)
+	defer cancel(errors.WithStack(context.Canceled))
 
 	client := NewFileSyncClient(c.Conn())
 

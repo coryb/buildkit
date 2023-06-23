@@ -92,7 +92,7 @@ func (ls *localSourceHandler) Snapshot(ctx context.Context, g session.Group) (ca
 		return ls.snapshotWithAnySession(ctx, g)
 	}
 
-	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "local Snapshot"))
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer cancel()
 
 	caller, err := ls.sm.Get(timeoutCtx, sessionID, false)

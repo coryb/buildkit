@@ -143,7 +143,7 @@ func (e *localExporterInstance) Export(ctx context.Context, inp *exporter.Source
 		fs = d.FS
 	}
 
-	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.Wrap(context.DeadlineExceeded, "local Export"))
+	timeoutCtx, cancel := context.WithTimeoutCause(ctx, 5*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer cancel()
 
 	caller, err := e.opt.SessionManager.Get(timeoutCtx, sessionID, false)

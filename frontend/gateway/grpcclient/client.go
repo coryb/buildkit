@@ -43,7 +43,7 @@ type GrpcClient interface {
 }
 
 func New(ctx context.Context, opts map[string]string, session, product string, c pb.LLBBridgeClient, w []client.WorkerInfo) (GrpcClient, error) {
-	pingCtx, pingCancel := context.WithTimeoutCause(ctx, 15*time.Second, errors.Wrap(context.DeadlineExceeded, "client ping"))
+	pingCtx, pingCancel := context.WithTimeoutCause(ctx, 15*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer pingCancel()
 	resp, err := c.Ping(pingCtx, &pb.PingRequest{})
 	if err != nil {
@@ -622,14 +622,16 @@ type messageForwarder struct {
 }
 
 func newMessageForwarder(ctx context.Context, client pb.LLBBridgeClient) *messageForwarder {
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancelCause(ctx)
 	eg, ctx := errgroup.WithContext(ctx)
 	return &messageForwarder{
 		client: client,
 		pids:   map[string]*procMessageForwarder{},
 		ctx:    ctx,
-		cancel: cancel,
-		eg:     eg,
+		cancel: func() {
+			cancel(errors.WithStack(context.Canceled))
+		},
+		eg: eg,
 	}
 }
 
@@ -1137,7 +1139,7 @@ func grpcClientConn(ctx context.Context) (context.Context, *grpc.ClientConn, err
 		return nil, nil, errors.Wrap(err, "failed to create grpc client")
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancelCause(ctx)
 	_ = cancel
 	// go monitorHealth(ctx, cc, cancel)
 

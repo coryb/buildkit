@@ -31,10 +31,12 @@ func (p *ProviderWithProgress) ReaderAt(ctx context.Context, desc ocispecs.Descr
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancelCause(ctx)
 	doneCh := make(chan struct{})
 	go trackProgress(ctx, desc, p.Manager, doneCh)
-	return readerAtWithCancel{ReaderAt: ra, cancel: cancel, doneCh: doneCh, logger: bklog.G(ctx)}, nil
+	return readerAtWithCancel{ReaderAt: ra, cancel: func() {
+		cancel(errors.WithStack(context.Canceled))
+	}, doneCh: doneCh, logger: bklog.G(ctx)}, nil
 }
 
 type readerAtWithCancel struct {
@@ -65,10 +67,12 @@ func (f *FetcherWithProgress) Fetch(ctx context.Context, desc ocispecs.Descripto
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, cancel := context.WithCancelCause(ctx)
 	doneCh := make(chan struct{})
 	go trackProgress(ctx, desc, f.Manager, doneCh)
-	return readerWithCancel{ReadCloser: rc, cancel: cancel, doneCh: doneCh, logger: bklog.G(ctx)}, nil
+	return readerWithCancel{ReadCloser: rc, cancel: func() {
+		cancel(errors.WithStack(context.Canceled))
+	}, doneCh: doneCh, logger: bklog.G(ctx)}, nil
 }
 
 type readerWithCancel struct {

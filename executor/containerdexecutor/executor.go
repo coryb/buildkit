@@ -369,8 +369,8 @@ func (w *containerdExecutor) runProcess(ctx context.Context, p containerd.Proces
 
 	// handle signals (and resize) in separate go loop so it does not
 	// potentially block the container cancel/exit status loop below.
-	eventCtx, eventCancel := context.WithCancel(ctx)
-	defer eventCancel()
+	eventCtx, eventCancel := context.WithCancelCause(ctx)
+	defer eventCancel(errors.WithStack(context.Canceled))
 	go func() {
 		for {
 			select {
@@ -412,7 +412,7 @@ func (w *containerdExecutor) runProcess(ctx context.Context, p containerd.Proces
 		case <-ctxDone:
 			ctxDone = nil
 			var killCtx context.Context
-			killCtx, cancel = context.WithTimeoutCause(context.Background(), 10*time.Second, errors.Wrap(context.DeadlineExceeded, "runProcess"))
+			killCtx, cancel = context.WithTimeoutCause(context.Background(), 10*time.Second, errors.WithStack(context.DeadlineExceeded))
 			killCtxDone = killCtx.Done()
 			p.Kill(killCtx, syscall.SIGKILL)
 			io.Cancel()

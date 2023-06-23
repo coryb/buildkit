@@ -105,7 +105,7 @@ func getContentStore(ctx context.Context, sm *session.Manager, g session.Group, 
 	if sessionID == "" {
 		return nil, errors.New("local cache exporter/importer requires session")
 	}
-	timeoutCtx, cancel := context.WithTimeoutCause(context.Background(), 5*time.Second, errors.Wrap(context.DeadlineExceeded, "getContentStore"))
+	timeoutCtx, cancel := context.WithTimeoutCause(context.Background(), 5*time.Second, errors.WithStack(context.DeadlineExceeded))
 	defer cancel()
 
 	caller, err := sm.Get(timeoutCtx, sessionID, false)

@@ -487,10 +487,10 @@ func (c *Controller) Session(stream controlapi.Control_SessionServer) error {
 	conn, closeCh, opts := grpchijack.Hijack(stream)
 	defer conn.Close()
 
-	ctx, cancel := context.WithCancel(stream.Context())
+	ctx, cancel := context.WithCancelCause(stream.Context())
 	go func() {
 		<-closeCh
-		cancel()
+		cancel(errors.WithStack(context.Canceled))
 	}()
 
 	err := c.opt.SessionManager.HandleConn(ctx, conn, opts)
@@ -633,7 +633,7 @@ func cacheOptKey(opt controlapi.CacheOptionsEntry) (string, error) {
 	if opt.Type == "registry" && opt.Attrs["ref"] != "" {
 		return opt.Attrs["ref"], nil
 	}
-	var rawOpt = struct {
+	rawOpt := struct {
 		Type  string
 		Attrs map[string]string
 	}{
