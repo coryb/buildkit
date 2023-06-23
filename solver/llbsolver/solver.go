@@ -172,7 +172,7 @@ func (s *Solver) recordBuildHistory(ctx context.Context, id string, req frontend
 		return nil, err
 	}
 
-	return func(res *Result, descref exporter.DescriptorReference, err error) error {
+	return func(res *Result, descref exporter.DescriptorReference, err error) (retErr error) {
 		en := time.Now()
 		rec.CompletedAt = &en
 
@@ -185,8 +185,15 @@ func (s *Solver) recordBuildHistory(ctx context.Context, id string, req frontend
 			}
 		}
 
-		ctx, cancel := context.WithTimeoutCause(context.Background(), 20*time.Second, errors.WithStack(context.DeadlineExceeded))
+		timeoutErr := errors.New("failed to record history, too slow")
+		ctx, cancel := context.WithTimeoutCause(context.Background(), 5*time.Second, timeoutErr)
 		defer cancel()
+		defer func() {
+			if errors.Is(retErr, timeoutErr) {
+				bklog.G(ctx).Warnf("failed to record build history within 5s")
+				retErr = nil
+			}
+		}()
 
 		var mu sync.Mutex
 		ch := make(chan *client.SolveStatus)
