@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"encoding/json"
+	goerrors "errors"
 	"fmt"
 	"io"
 	"maps"
@@ -536,9 +537,21 @@ func newPipe() *pipe {
 		conn: &conn{
 			Reader: pr2,
 			Writer: pw1,
-			Closer: pw2,
+			Closer: multicloser{pw2, pr2, pr1, pw1},
 		},
 	}
+}
+
+type multicloser []io.Closer
+
+func (mc multicloser) Close() error {
+	var errs []error
+	for _, c := range mc {
+		if cerr := c.Close(); cerr != nil {
+			errs = append(errs, cerr)
+		}
+	}
+	return goerrors.Join(errs...)
 }
 
 type conn struct {
