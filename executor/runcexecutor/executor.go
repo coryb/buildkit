@@ -151,6 +151,7 @@ func New(opt Opt, networkProviders map[pb.NetMode]network.Provider) (executor.Ex
 func (w *runcExecutor) Run(ctx context.Context, id string, root executor.Mount, mounts []executor.Mount, process executor.ProcessInfo, started chan<- struct{}) (rec resourcestypes.Recorder, err error) {
 	startedOnce := sync.Once{}
 	done := make(chan error, 1)
+	trace.SpanFromContext(ctx).AddEvent("runcExecutor Run")
 	w.mu.Lock()
 	w.running[id] = done
 	w.mu.Unlock()
@@ -176,6 +177,7 @@ func (w *runcExecutor) Run(ctx context.Context, id string, root executor.Mount, 
 	if !ok {
 		return nil, errors.Errorf("unknown network mode %s", meta.NetMode)
 	}
+	trace.SpanFromContext(ctx).AddEvent("runcExecutor retrieving network provider")
 	namespace, err := provider.New(ctx, meta.Hostname)
 	if err != nil {
 		return nil, err
