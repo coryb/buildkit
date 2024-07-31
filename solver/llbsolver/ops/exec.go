@@ -375,6 +375,7 @@ func (e *ExecOp) Exec(ctx context.Context, g session.Group, inputs []solver.Resu
 		desc := fmt.Sprintf("mount %s from exec %s", m.Dest, strings.Join(e.op.Meta.Args, " "))
 		return e.cm.New(ctx, ref, g, cache.WithDescription(desc))
 	}, platformOS)
+	trace.SpanFromContext(ctx).AddEvent("ExecOp mounts prepared")
 	defer func() {
 		if err != nil {
 			execInputs := make([]solver.Result, len(e.op.Mounts))
@@ -465,6 +466,7 @@ func (e *ExecOp) Exec(ctx context.Context, g session.Group, inputs []solver.Resu
 	if err != nil {
 		return nil, err
 	}
+	trace.SpanFromContext(ctx).AddEvent("ExecOp secrets loaded")
 	meta.Env = append(meta.Env, secretEnv...)
 
 	stdout, stderr, flush := logs.NewLogStreams(ctx, os.Getenv("BUILDKIT_DEBUG_EXEC_OUTPUT") == "1")
